@@ -44,6 +44,17 @@ h2 { font-size: 1.2rem; }
   padding: 1.25rem;
 }
 
+.messages { list-style: none; padding: 0; margin: 0 0 1rem; }
+.message {
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+}
+.message-success { background: #ecfdf5; border-color: #a7f3d0; }
+.message-error { background: #fef2f2; border-color: #fecaca; }
+.message-warning { background: #fffbeb; border-color: #fde68a; }
 
 /* Buttons and forms */
 .button, button {

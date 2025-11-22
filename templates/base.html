@@ -12,6 +12,7 @@
 <body class="{% block body_class %}{% endblock %}">
   {% block body %}
   <main class="container">
+    {% include "includes/messages.html" %}
     {% block content %}{% endblock %}
   </main>
   {% endblock %}
