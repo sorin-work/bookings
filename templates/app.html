@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block body_class %}app{% endblock %}
+{% block body %}
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'dashboard:home' %}">{% if business %}{{ business.name }}{% else %}Bookings{% endif %}</a>
+    <nav class="nav">
+      {% nav_link "dashboard:home" "Dashboard" exact=True %}
+    </nav>
+    <div class="sidebar-footer">
+      <span class="muted">{{ user.email }}</span>
+    </div>
+  </aside>
+  <main class="content">
+    {% include "includes/messages.html" %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

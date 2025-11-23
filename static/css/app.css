@@ -87,3 +87,30 @@ input[type="checkbox"] { width: auto; }
 .field { margin-bottom: 1rem; }
 .errorlist { color: var(--danger); list-style: none; padding: 0; margin: 0.25rem 0 0; font-size: 0.9rem; }
 .helptext { color: var(--muted); font-size: 0.85rem; }
+
+/* Signed-in layout */
+.shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.brand { font-weight: 700; font-size: 1.05rem; color: var(--text); text-decoration: none; }
+.nav { display: flex; flex-direction: column; gap: 0.15rem; }
+.nav-link { padding: 0.4rem 0.6rem; border-radius: 6px; color: var(--text); text-decoration: none; }
+.nav-link:hover { background: var(--bg); }
+.nav-link.is-current { background: var(--bg); font-weight: 600; color: var(--primary); }
+.sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.9rem; }
+.content { padding: 2rem; min-width: 0; }
+.page-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+.page-header h1 { margin: 0; }
+
+.landing .hero { text-align: center; padding: 3rem 0 2rem; }
+.landing .hero h1 { font-size: 2.2rem; }
+.lead { font-size: 1.1rem; color: var(--muted); max-width: 640px; margin: 0 auto; }
+.landing .actions { justify-content: center; }
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+.auth { max-width: 420px; margin: 3rem auto; }
