@@ -10,6 +10,10 @@
     </nav>
     <div class="sidebar-footer">
       <span class="muted">{{ user.email }}</span>
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="link-button">Log out</button>
+      </form>
     </div>
   </aside>
   <main class="content">

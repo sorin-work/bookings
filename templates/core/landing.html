@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Bookings — online appointments for small businesses{% endblock %}
+{% block body_class %}landing{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Let your customers book themselves in</h1>
+  <p class="lead">A booking page for salons, tutors, physios and anyone else who works by appointment.
+    Set your services, staff and opening hours; customers pick a free time and get a confirmation by email.</p>
+  <p class="actions">
+    <a class="button button-primary" href="{% url 'accounts:signup' %}">Create your booking page</a>
+    <a class="button" href="{% url 'accounts:login' %}">Log in</a>
+  </p>
+</section>
+<section class="features">
+  <div class="card">
+    <h2>Free times, worked out for you</h2>
+    <p>Working hours, time off, existing appointments, clean-up buffers and minimum notice are all taken into account.</p>
+  </div>
+  <div class="card">
+    <h2>No account needed for customers</h2>
+    <p>Customers book with a name, email and phone number, and manage their booking from a link in the email.</p>
+  </div>
+  <div class="card">
+    <h2>A calendar for the team</h2>
+    <p>Day and week views for every staff member, with the details of each booking one click away.</p>
+  </div>
+</section>
+{% endblock %}
