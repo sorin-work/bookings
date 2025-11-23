@@ -16,6 +16,7 @@ select = ["E", "F", "W", "I", "B", "UP", "DJ", "SIM"]
 known-first-party = [
     "config",
     "core",
+    "accounts",
 ]
 
 [tool.pytest.ini_options]
