@@ -17,6 +17,7 @@ known-first-party = [
     "config",
     "core",
     "accounts",
+    "businesses",
     "dashboard",
 ]
 
