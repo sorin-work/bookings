@@ -2,6 +2,7 @@ import pytest
 from django.urls import reverse
 
 from accounts.models import User
+from businesses.models import Business
 from conftest import PASSWORD
 
 pytestmark = pytest.mark.django_db
@@ -12,6 +13,8 @@ def signup_data(**overrides):
         "email": "new@example.com",
         "password1": "a-long-and-unusual-password",
         "password2": "a-long-and-unusual-password",
+        "business_name": "Studio One",
+        "timezone": "Europe/Berlin",
     }
     data.update(overrides)
     return data
@@ -23,6 +26,15 @@ def test_sign_up_creates_an_account_and_logs_in(client):
     assert response.status_code == 302
     user = User.objects.get(email="new@example.com")
     assert client.session["_auth_user_id"] == str(user.pk)
+
+
+def test_sign_up_creates_the_business(client):
+    client.post(reverse("accounts:signup"), signup_data())
+
+    business = Business.objects.get(owner__email="new@example.com")
+    assert business.name == "Studio One"
+    assert business.slug == "studio-one"
+    assert business.timezone == "Europe/Berlin"
 
 
 def test_sign_up_rejects_an_email_that_is_taken(client, user):

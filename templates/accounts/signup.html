@@ -6,6 +6,8 @@
   <form method="post" class="card" novalidate>
     {% csrf_token %}
     {% include "includes/form_errors.html" %}
+    {% include "includes/field.html" with field=form.business_name %}
+    {% include "includes/field.html" with field=form.timezone %}
     {% include "includes/field.html" with field=form.email %}
     {% include "includes/field.html" with field=form.password1 %}
     {% include "includes/field.html" with field=form.password2 %}

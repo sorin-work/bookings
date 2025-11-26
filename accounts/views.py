@@ -13,7 +13,7 @@ def signup(request):
     if request.method == "POST" and form.is_valid():
         user = form.save()
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-        messages.success(request, "Welcome! Your account is ready.")
+        messages.success(request, "Welcome! Next, add the services you offer.")
         return redirect("dashboard:home")
     return render(request, "accounts/signup.html", {"form": form})
 
