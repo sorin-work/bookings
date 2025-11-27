@@ -1,0 +1,26 @@
+{% extends "app.html" %}
+{% block title %}Settings · {{ business.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Settings</h1>
+</div>
+<form method="post" class="card form" novalidate>
+  {% csrf_token %}
+  {% include "includes/form_errors.html" %}
+  <h2>Business</h2>
+  {% include "includes/field.html" with field=form.name %}
+  {% include "includes/field.html" with field=form.slug %}
+  {% include "includes/field.html" with field=form.timezone %}
+  {% include "includes/field.html" with field=form.email %}
+  {% include "includes/field.html" with field=form.phone %}
+  {% include "includes/field.html" with field=form.address %}
+  {% include "includes/field.html" with field=form.description %}
+  <h2>Booking rules</h2>
+  {% include "includes/field.html" with field=form.slot_interval_minutes %}
+  {% include "includes/field.html" with field=form.min_notice_minutes %}
+  {% include "includes/field.html" with field=form.max_advance_days %}
+  <div class="actions">
+    <button type="submit" class="button button-primary">Save settings</button>
+  </div>
+</form>
+{% endblock %}

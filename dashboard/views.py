@@ -1,7 +1,9 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
+from businesses.decorators import business_required
 
-@login_required
+
+@business_required
 def home(request):
-    return render(request, "dashboard/home.html")
+    business = request.business
+    return render(request, "dashboard/home.html", {"business": business})

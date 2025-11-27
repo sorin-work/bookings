@@ -1,0 +1,15 @@
+{% extends "app.html" %}
+{% block title %}Set up your business{% endblock %}
+{% block content %}
+<h1>Set up your business</h1>
+<p class="muted">Your account doesn't have a business yet. Add one to get a booking page.</p>
+<form method="post" class="card form" novalidate>
+  {% csrf_token %}
+  {% include "includes/form_errors.html" %}
+  {% include "includes/field.html" with field=form.name %}
+  {% include "includes/field.html" with field=form.slug %}
+  {% include "includes/field.html" with field=form.timezone %}
+  {% include "includes/field.html" with field=form.email %}
+  <div class="actions"><button type="submit" class="button button-primary">Create business</button></div>
+</form>
+{% endblock %}
