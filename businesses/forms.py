@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Business
+from .models import Business, Service
 from .timezones import timezone_choices
 
 
@@ -39,3 +39,17 @@ class BusinessForm(forms.ModelForm):
 class BusinessSetupForm(BusinessForm):
     class Meta(BusinessForm.Meta):
         fields = ["name", "slug", "timezone", "email"]
+
+
+class ServiceForm(forms.ModelForm):
+    class Meta:
+        model = Service
+        fields = [
+            "name",
+            "description",
+            "duration_minutes",
+            "price",
+            "buffer_before_minutes",
+            "buffer_after_minutes",
+        ]
+        widgets = {"description": forms.Textarea(attrs={"rows": 3})}

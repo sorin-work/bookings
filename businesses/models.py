@@ -82,3 +82,33 @@ class Business(models.Model):
 
     def today(self):
         return self.local_now().date()
+
+
+class Service(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="services")
+    name = models.CharField(max_length=120)
+    description = models.TextField(blank=True)
+    duration_minutes = models.PositiveSmallIntegerField(
+        "duration (minutes)", validators=[MinValueValidator(5), MaxValueValidator(12 * 60)]
+    )
+    price = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
+    buffer_before_minutes = models.PositiveSmallIntegerField(
+        "buffer before (minutes)",
+        default=0,
+        validators=[MaxValueValidator(240)],
+        help_text="Time kept free before the appointment, for example to set up.",
+    )
+    buffer_after_minutes = models.PositiveSmallIntegerField(
+        "buffer after (minutes)",
+        default=0,
+        validators=[MaxValueValidator(240)],
+        help_text="Time kept free afterwards, for example to clean up.",
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
