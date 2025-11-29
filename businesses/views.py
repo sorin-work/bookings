@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from .decorators import business_required
 from .forms import BusinessForm, BusinessSetupForm, ServiceForm
@@ -43,6 +44,7 @@ def service_list(request):
     services = request.business.services.all()
     context = {
         "services": [s for s in services if s.is_active],
+        "archived": [s for s in services if not s.is_active],
     }
     return render(request, "businesses/service_list.html", context)
 
@@ -59,3 +61,19 @@ def service_form(request, pk=None):
         messages.success(request, f"Saved {service.name}.")
         return redirect("businesses:services")
     return render(request, "businesses/service_form.html", {"form": form, "service": service})
+
+
+@business_required
+@require_POST
+def service_archive(request, pk):
+    service = get_object_or_404(request.business.services, pk=pk)
+    service.is_active = not service.is_active
+    service.save(update_fields=["is_active"])
+    if service.is_active:
+        messages.success(request, f"{service.name} is bookable again.")
+    else:
+        messages.success(
+            request,
+            f"Archived {service.name}. Existing bookings stay, but it can't be booked any more.",
+        )
+    return redirect("businesses:services")

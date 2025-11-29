@@ -25,6 +25,7 @@
       </td>
       <td class="num">{{ service.price|money }}</td>
       <td class="actions" style="margin: 0; justify-content: flex-end">
+        <form method="post" action="{% url 'businesses:service_archive' service.pk %}">{% csrf_token %}<button class="button-small">Archive</button></form>
       </td>
     </tr>
     {% endfor %}
@@ -32,5 +33,21 @@
 </table>
 {% else %}
 <div class="card empty">No services yet. Add the first thing customers can book.</div>
+{% endif %}
+
+{% if archived %}
+<h2>Archived</h2>
+<table class="table">
+  <tbody>
+    {% for service in archived %}
+    <tr>
+      <td class="muted">{{ service.name }}</td>
+      <td class="num">
+        <form method="post" action="{% url 'businesses:service_archive' service.pk %}">{% csrf_token %}<button class="button-small">Restore</button></form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endif %}
 {% endblock %}
