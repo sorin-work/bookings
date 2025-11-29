@@ -1,0 +1,23 @@
+{% extends "app.html" %}
+{% block title %}{% if service %}{{ service.name }}{% else %}New service{% endif %}{% endblock %}
+{% block content %}
+<h1>{% if service %}Edit {{ service.name }}{% else %}New service{% endif %}</h1>
+<form method="post" class="card form" novalidate>
+  {% csrf_token %}
+  {% include "includes/form_errors.html" %}
+  {% include "includes/field.html" with field=form.name %}
+  {% include "includes/field.html" with field=form.description %}
+  <div class="form-row">
+    {% include "includes/field.html" with field=form.duration_minutes %}
+    {% include "includes/field.html" with field=form.price %}
+  </div>
+  <div class="form-row">
+    {% include "includes/field.html" with field=form.buffer_before_minutes %}
+    {% include "includes/field.html" with field=form.buffer_after_minutes %}
+  </div>
+  <div class="actions">
+    <button type="submit" class="button button-primary">Save</button>
+    <a href="{% url 'businesses:services' %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

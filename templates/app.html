@@ -7,6 +7,7 @@
     <a class="brand" href="{% url 'dashboard:home' %}">{% if business %}{{ business.name }}{% else %}Bookings{% endif %}</a>
     <nav class="nav">
       {% nav_link "dashboard:home" "Dashboard" exact=True %}
+      {% nav_link "businesses:services" "Services" %}
       {% nav_link "businesses:settings" "Settings" %}
     </nav>
     <div class="sidebar-footer">

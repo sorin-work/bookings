@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .decorators import business_required
-from .forms import BusinessForm, BusinessSetupForm
+from .forms import BusinessForm, BusinessSetupForm, ServiceForm
 from .models import Business
 from .utils import unique_slug
 
@@ -36,3 +36,26 @@ def settings_view(request):
         messages.success(request, "Settings saved.")
         return redirect("businesses:settings")
     return render(request, "businesses/settings.html", {"form": form})
+
+
+@business_required
+def service_list(request):
+    services = request.business.services.all()
+    context = {
+        "services": [s for s in services if s.is_active],
+    }
+    return render(request, "businesses/service_list.html", context)
+
+
+@business_required
+def service_form(request, pk=None):
+    business = request.business
+    service = get_object_or_404(business.services, pk=pk) if pk else None
+    form = ServiceForm(request.POST or None, instance=service)
+    if request.method == "POST" and form.is_valid():
+        service = form.save(commit=False)
+        service.business = business
+        service.save()
+        messages.success(request, f"Saved {service.name}.")
+        return redirect("businesses:services")
+    return render(request, "businesses/service_form.html", {"form": form, "service": service})
