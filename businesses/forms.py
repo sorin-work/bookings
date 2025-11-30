@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Business, Service
+from .models import Business, Service, StaffMember
 from .timezones import timezone_choices
 
 
@@ -53,3 +53,24 @@ class ServiceForm(forms.ModelForm):
             "buffer_after_minutes",
         ]
         widgets = {"description": forms.Textarea(attrs={"rows": 3})}
+
+
+class StaffForm(forms.ModelForm):
+    class Meta:
+        model = StaffMember
+        fields = [
+            "name",
+            "email",
+            "services",
+        ]
+        widgets = {
+            "services": forms.CheckboxSelectMultiple,
+        }
+        help_texts = {
+            "email": "Optional. Used to send staff a copy of their bookings.",
+            "services": "The services this person can be booked for.",
+        }
+
+    def __init__(self, *args, business, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["services"].queryset = business.services.filter(is_active=True)

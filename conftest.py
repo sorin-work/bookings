@@ -3,7 +3,7 @@ from decimal import Decimal
 import pytest
 
 from accounts.models import User
-from businesses.models import Business, Service
+from businesses.models import Business, Service, StaffMember
 
 PASSWORD = "correct-horse-battery-staple"
 
@@ -35,3 +35,10 @@ def service(business):
         price=Decimal("35.00"),
         buffer_after_minutes=15,
     )
+
+
+@pytest.fixture
+def staff(business, service):
+    member = StaffMember.objects.create(business=business, name="Robin", email="robin@example.com")
+    member.services.add(service)
+    return member

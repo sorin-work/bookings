@@ -112,3 +112,18 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class StaffMember(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="staff")
+    name = models.CharField(max_length=120)
+    email = models.EmailField(blank=True)
+    services = models.ManyToManyField(Service, related_name="staff", blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "staff member"
+
+    def __str__(self):
+        return self.name
