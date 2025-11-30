@@ -7,7 +7,7 @@
 </div>
 {% if staff %}
 <table class="table">
-  <thead><tr><th>Name</th><th>Services</th><th></th><th></th></tr></thead>
+  <thead><tr><th>Name</th><th>Services</th><th>Working days</th><th></th></tr></thead>
   <tbody>
     {% for member in staff %}
     <tr>
@@ -17,6 +17,7 @@
       </td>
       <td>{% for service in member.services.all %}{{ service.name }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="muted">None yet</span>{% endfor %}</td>
       <td>
+        {% for row in member.working_hours.all %}{% ifchanged row.weekday %}{{ row.get_weekday_display|slice:":3" }} {% endifchanged %}{% empty %}<span class="muted">No hours set</span>{% endfor %}
       </td>
       <td class="actions" style="margin: 0; justify-content: flex-end">
         <a class="button button-small" href="{% url 'businesses:staff_hours' member.pk %}">Hours</a>
