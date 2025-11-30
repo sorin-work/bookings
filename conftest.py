@@ -1,9 +1,10 @@
+from datetime import time
 from decimal import Decimal
 
 import pytest
 
 from accounts.models import User
-from businesses.models import Business, Service, StaffMember
+from businesses.models import Business, Service, StaffMember, WorkingHours
 
 PASSWORD = "correct-horse-battery-staple"
 
@@ -41,4 +42,8 @@ def service(business):
 def staff(business, service):
     member = StaffMember.objects.create(business=business, name="Robin", email="robin@example.com")
     member.services.add(service)
+    for weekday in range(5):
+        WorkingHours.objects.create(
+            staff=member, weekday=weekday, start_time=time(9), end_time=time(17)
+        )
     return member

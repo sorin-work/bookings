@@ -1,3 +1,4 @@
+from datetime import time
 from functools import cached_property
 from zoneinfo import ZoneInfo
 
@@ -127,3 +128,28 @@ class StaffMember(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class WorkingHours(models.Model):
+    """One stretch of work on a weekday. Several rows on a day make a split shift."""
+
+    class Weekday(models.IntegerChoices):
+        MONDAY = 0
+        TUESDAY = 1
+        WEDNESDAY = 2
+        THURSDAY = 3
+        FRIDAY = 4
+        SATURDAY = 5
+        SUNDAY = 6
+
+    staff = models.ForeignKey(StaffMember, on_delete=models.CASCADE, related_name="working_hours")
+    weekday = models.PositiveSmallIntegerField(choices=Weekday.choices)
+    start_time = models.TimeField(default=time(9))
+    end_time = models.TimeField(default=time(17))
+
+    class Meta:
+        ordering = ["weekday", "start_time"]
+        verbose_name_plural = "working hours"
+
+    def __str__(self):
+        return f"{self.get_weekday_display()} {self.start_time:%H:%M}–{self.end_time:%H:%M}"
