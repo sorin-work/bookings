@@ -1,0 +1,16 @@
+{% extends "app.html" %}
+{% block title %}{% if member %}{{ member.name }}{% else %}New staff member{% endif %}{% endblock %}
+{% block content %}
+<h1>{% if member %}Edit {{ member.name }}{% else %}New staff member{% endif %}</h1>
+<form method="post" class="card form" novalidate>
+  {% csrf_token %}
+  {% include "includes/form_errors.html" %}
+  {% include "includes/field.html" with field=form.name %}
+  {% include "includes/field.html" with field=form.email %}
+  {% include "includes/field.html" with field=form.services %}
+  <div class="actions">
+    <button type="submit" class="button button-primary">Save</button>
+    <a href="{% url 'businesses:staff' %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

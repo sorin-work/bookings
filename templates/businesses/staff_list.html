@@ -1,0 +1,30 @@
+{% extends "app.html" %}
+{% block title %}Staff · {{ business.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Staff</h1>
+  <a class="button button-primary" href="{% url 'businesses:staff_new' %}">Add staff member</a>
+</div>
+{% if staff %}
+<table class="table">
+  <thead><tr><th>Name</th><th>Services</th><th></th><th></th></tr></thead>
+  <tbody>
+    {% for member in staff %}
+    <tr>
+      <td>
+        <a href="{% url 'businesses:staff_edit' member.pk %}">{{ member.name }}</a>
+        {% if member.email %}<div class="muted small">{{ member.email }}</div>{% endif %}
+      </td>
+      <td>{% for service in member.services.all %}{{ service.name }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="muted">None yet</span>{% endfor %}</td>
+      <td>
+      </td>
+      <td class="actions" style="margin: 0; justify-content: flex-end">
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card empty">No staff yet. Even if it's just you, add yourself so customers can book you.</div>
+{% endif %}
+{% endblock %}

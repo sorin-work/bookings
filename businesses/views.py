@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from .decorators import business_required
-from .forms import BusinessForm, BusinessSetupForm, ServiceForm
+from .forms import BusinessForm, BusinessSetupForm, ServiceForm, StaffForm
 from .models import Business
 from .utils import unique_slug
 
@@ -77,3 +77,24 @@ def service_archive(request, pk):
             f"Archived {service.name}. Existing bookings stay, but it can't be booked any more.",
         )
     return redirect("businesses:services")
+
+
+@business_required
+def staff_list(request):
+    staff = request.business.staff.prefetch_related("services")
+    return render(request, "businesses/staff_list.html", {"staff": staff})
+
+
+@business_required
+def staff_form(request, pk=None):
+    business = request.business
+    member = get_object_or_404(business.staff, pk=pk) if pk else None
+    form = StaffForm(request.POST or None, instance=member, business=business)
+    if request.method == "POST" and form.is_valid():
+        member = form.save(commit=False)
+        member.business = business
+        member.save()
+        form.save_m2m()
+        messages.success(request, f"Saved {member.name}.")
+        return redirect("businesses:staff")
+    return render(request, "businesses/staff_form.html", {"form": form, "member": member})
