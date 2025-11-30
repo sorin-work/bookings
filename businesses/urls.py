@@ -14,4 +14,5 @@ urlpatterns = [
     path("staff/", views.staff_list, name="staff"),
     path("staff/new/", views.staff_form, name="staff_new"),
     path("staff/<int:pk>/edit/", views.staff_form, name="staff_edit"),
+    path("staff/<int:pk>/hours/", views.staff_hours, name="staff_hours"),
 ]

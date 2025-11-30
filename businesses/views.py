@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from .decorators import business_required
-from .forms import BusinessForm, BusinessSetupForm, ServiceForm, StaffForm
+from .forms import BusinessForm, BusinessSetupForm, ServiceForm, StaffForm, WeeklyHoursForm
 from .models import Business
 from .utils import unique_slug
 
@@ -82,6 +82,7 @@ def service_archive(request, pk):
 @business_required
 def staff_list(request):
     staff = request.business.staff.prefetch_related("services")
+    staff = staff.prefetch_related("working_hours")
     return render(request, "businesses/staff_list.html", {"staff": staff})
 
 
@@ -96,5 +97,19 @@ def staff_form(request, pk=None):
         member.save()
         form.save_m2m()
         messages.success(request, f"Saved {member.name}.")
+        if pk is None:
+            messages.info(request, "Now add their working hours.")
+            return redirect("businesses:staff_hours", pk=member.pk)
         return redirect("businesses:staff")
     return render(request, "businesses/staff_form.html", {"form": form, "member": member})
+
+
+@business_required
+def staff_hours(request, pk):
+    member = get_object_or_404(request.business.staff, pk=pk)
+    form = WeeklyHoursForm(request.POST or None, staff=member)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, f"Working hours for {member.name} saved.")
+        return redirect("businesses:staff")
+    return render(request, "businesses/staff_hours.html", {"form": form, "member": member})

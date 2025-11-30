@@ -123,3 +123,8 @@ input[type="checkbox"] { width: auto; }
 .table .num { text-align: right; font-variant-numeric: tabular-nums; }
 .badge { display: inline-block; padding: 0.05rem 0.5rem; border-radius: 999px; font-size: 0.8rem; background: var(--bg); border: 1px solid var(--border); }
 .empty { padding: 2rem; text-align: center; color: var(--muted); }
+
+.hours-grid { display: grid; gap: 0.5rem; }
+.hours-day { display: grid; grid-template-columns: 120px 1fr; gap: 1rem; align-items: start; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+.hours-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.4rem; }
+.hours-row input[type="time"] { width: 8rem; }

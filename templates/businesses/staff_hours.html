@@ -1,0 +1,29 @@
+{% extends "app.html" %}
+{% block title %}Working hours · {{ member.name }}{% endblock %}
+{% block content %}
+<h1>Working hours for {{ member.name }}</h1>
+<p class="muted">Times are in {{ business.timezone }}. Leave a day empty if {{ member.name }} doesn't work that day. Use the second row for a split shift.</p>
+<form method="post" class="card form form-wide" novalidate>
+  {% csrf_token %}
+  {% include "includes/form_errors.html" %}
+  <div class="hours-grid">
+    {% for day in form.days %}
+    <div class="hours-day">
+      <strong>{{ day.label }}</strong>
+      <div>
+        {% for start, end in day.shifts %}
+        <div class="hours-row">
+          {{ start }} <span>to</span> {{ end }}
+        </div>
+        {{ start.errors }}{{ end.errors }}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="actions">
+    <button type="submit" class="button button-primary">Save hours</button>
+    <a href="{% url 'businesses:staff' %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}
