@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import F, Q
 from django.utils import timezone
 
 from .timezones import validate_timezone
@@ -150,6 +151,11 @@ class WorkingHours(models.Model):
     class Meta:
         ordering = ["weekday", "start_time"]
         verbose_name_plural = "working hours"
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(end_time__gt=F("start_time")), name="working_hours_end_after_start"
+            )
+        ]
 
     def __str__(self):
         return f"{self.get_weekday_display()} {self.start_time:%H:%M}–{self.end_time:%H:%M}"

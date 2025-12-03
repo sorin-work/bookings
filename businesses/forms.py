@@ -135,6 +135,9 @@ class WeeklyHoursForm(forms.Form):
                 if start is None or end is None:
                     self.add_error(start_name if start is None else end_name, "Enter both times.")
                     continue
+                if end <= start:
+                    self.add_error(end_name, "Must be after the start time.")
+                    continue
                 if previous_end is not None and start < previous_end:
                     self.add_error(start_name, "Overlaps the shift before it.")
                     continue
