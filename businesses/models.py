@@ -159,3 +159,17 @@ class WorkingHours(models.Model):
 
     def __str__(self):
         return f"{self.get_weekday_display()} {self.start_time:%H:%M}–{self.end_time:%H:%M}"
+
+
+class TimeOff(models.Model):
+    staff = models.ForeignKey(StaffMember, on_delete=models.CASCADE, related_name="time_off")
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    reason = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        ordering = ["start"]
+        verbose_name_plural = "time off"
+
+    def __str__(self):
+        return f"{self.staff}: {self.start:%Y-%m-%d %H:%M} – {self.end:%Y-%m-%d %H:%M}"
