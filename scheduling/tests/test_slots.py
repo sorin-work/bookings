@@ -75,3 +75,16 @@ def test_time_off_blocks_slots():
     assert "10:00" not in starts(slots)
     assert "11:30" not in starts(slots)
     assert "12:30" in starts(slots)
+
+
+def test_nothing_before_the_earliest_start():
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(17))),
+        ServiceSpec(HOUR),
+        MONDAY,
+        LONDON,
+        interval=HALF_HOUR,
+        earliest=at(MONDAY, 13, 10),
+    )
+
+    assert starts(slots)[0] == "13:30"

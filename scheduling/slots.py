@@ -49,17 +49,18 @@ class Slot:
     staff_id: int
 
 
-def staff_slots(schedule, service, day, tz, *, interval):
+def staff_slots(schedule, service, day, tz, *, interval, earliest=None):
     """Start times on `day` (a local date) when `service` fits into `schedule`.
 
     `interval` is the step between offered start times, counted from the start of
-    each shift.
+    each shift. `earliest` is the first moment a slot may start (now plus the
+    minimum notice).
     """
     slots = []
     for shift in schedule.shifts:
         if shift.weekday != day.weekday():
             continue
-        offset = datetime.now(UTC).astimezone(tz).utcoffset()
+        offset = (earliest or datetime.now(UTC)).astimezone(tz).utcoffset()
         window_start = (datetime.combine(day, shift.start) - offset).replace(tzinfo=UTC)
         window_end = (datetime.combine(day, shift.end) - offset).replace(tzinfo=UTC)
         start = window_start
@@ -67,7 +68,8 @@ def staff_slots(schedule, service, day, tz, *, interval):
             end = start + service.duration
             if end >= window_end:
                 break
-            slots.append(Slot(start, end, schedule.staff_id))
+            if earliest is None or start >= earliest:
+                slots.append(Slot(start, end, schedule.staff_id))
             start += interval
     return [slot for slot in slots if not _blocked(slot, schedule.busy)]
 
