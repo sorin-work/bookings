@@ -1,6 +1,6 @@
 from datetime import date, time, timedelta
 
-from scheduling.slots import ServiceSpec, Shift, StaffSchedule, staff_slots
+from scheduling.slots import Interval, ServiceSpec, Shift, StaffSchedule, staff_slots
 from testutils import LONDON, at
 
 MONDAY = date(2026, 1, 12)
@@ -59,3 +59,19 @@ def test_service_longer_than_the_shift_has_no_slots():
     )
 
     assert slots == []
+
+
+def test_time_off_blocks_slots():
+    off = Interval(at(MONDAY, 10), at(MONDAY, 12))
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(14)), busy=[off]),
+        ServiceSpec(HOUR),
+        MONDAY,
+        LONDON,
+        interval=HALF_HOUR,
+    )
+
+    assert "09:30" not in starts(slots)
+    assert "10:00" not in starts(slots)
+    assert "11:30" not in starts(slots)
+    assert "12:30" in starts(slots)

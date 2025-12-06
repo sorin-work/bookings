@@ -69,7 +69,12 @@ def staff_slots(schedule, service, day, tz, *, interval):
                 break
             slots.append(Slot(start, end, schedule.staff_id))
             start += interval
-    return slots
+    return [slot for slot in slots if not _blocked(slot, schedule.busy)]
+
+
+def _blocked(slot, busy):
+    period = Interval(slot.start, slot.end)
+    return any(period.overlaps(other) for other in busy)
 
 
 def days_between(first: date, last: date):
