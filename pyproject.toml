@@ -18,6 +18,7 @@ known-first-party = [
     "core",
     "accounts",
     "businesses",
+    "scheduling",
     "dashboard",
 ]
 
