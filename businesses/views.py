@@ -1,10 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .decorators import business_required
-from .forms import BusinessForm, BusinessSetupForm, ServiceForm, StaffForm, WeeklyHoursForm
+from .forms import (
+    BusinessForm,
+    BusinessSetupForm,
+    ServiceForm,
+    StaffForm,
+    TimeOffForm,
+    WeeklyHoursForm,
+)
 from .models import Business
 from .utils import unique_slug
 
@@ -113,3 +121,28 @@ def staff_hours(request, pk):
         messages.success(request, f"Working hours for {member.name} saved.")
         return redirect("businesses:staff")
     return render(request, "businesses/staff_hours.html", {"form": form, "member": member})
+
+
+@business_required
+def staff_time_off(request, pk):
+    member = get_object_or_404(request.business.staff, pk=pk)
+    form = TimeOffForm(request.POST or None, staff=member)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Time off added.")
+        return redirect("businesses:staff_time_off", pk=member.pk)
+    upcoming = member.time_off.filter(end__gte=timezone.now())
+    return render(
+        request,
+        "businesses/staff_time_off.html",
+        {"form": form, "member": member, "time_off": upcoming},
+    )
+
+
+@business_required
+@require_POST
+def staff_time_off_delete(request, pk, time_off_pk):
+    member = get_object_or_404(request.business.staff, pk=pk)
+    get_object_or_404(member.time_off, pk=time_off_pk).delete()
+    messages.success(request, "Time off removed.")
+    return redirect("businesses:staff_time_off", pk=member.pk)

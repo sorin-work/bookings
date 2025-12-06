@@ -1,0 +1,45 @@
+{% extends "app.html" %}
+{% block title %}Time off · {{ member.name }}{% endblock %}
+{% block content %}
+<h1>Time off for {{ member.name }}</h1>
+<div class="dashboard-grid">
+  <div>
+    {% if time_off %}
+    <table class="table">
+      <thead><tr><th>From</th><th>Until</th><th>Reason</th><th></th></tr></thead>
+      <tbody>
+        {% for item in time_off %}
+        <tr>
+          <td>{{ item.start|date:"D j M Y, H:i" }}</td>
+          <td>{{ item.end|date:"D j M Y, H:i" }}</td>
+          <td>{{ item.reason|default:"–" }}</td>
+          <td>
+            <form method="post" action="{% url 'businesses:staff_time_off_delete' member.pk item.pk %}">
+              {% csrf_token %}<button class="button-small">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="card empty">No time off coming up.</div>
+    {% endif %}
+  </div>
+  <form method="post" class="card form" novalidate>
+    {% csrf_token %}
+    <h2>Add time off</h2>
+    {% include "includes/form_errors.html" %}
+    <div class="form-row">
+      {% include "includes/field.html" with field=form.start_date %}
+      {% include "includes/field.html" with field=form.start_time %}
+    </div>
+    <div class="form-row">
+      {% include "includes/field.html" with field=form.end_date %}
+      {% include "includes/field.html" with field=form.end_time %}
+    </div>
+    {% include "includes/field.html" with field=form.reason %}
+    <div class="actions"><button type="submit" class="button button-primary">Add</button></div>
+  </form>
+</div>
+{% endblock %}

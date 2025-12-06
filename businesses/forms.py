@@ -1,6 +1,8 @@
+from datetime import datetime, time, timedelta
+
 from django import forms
 
-from .models import Business, Service, StaffMember, WorkingHours
+from .models import Business, Service, StaffMember, TimeOff, WorkingHours
 from .timezones import timezone_choices
 
 
@@ -150,4 +152,46 @@ class WeeklyHoursForm(forms.Form):
         WorkingHours.objects.bulk_create(
             WorkingHours(staff=self.staff, weekday=weekday, start_time=start, end_time=end)
             for weekday, start, end in self.shifts
+        )
+
+
+class TimeOffForm(forms.Form):
+    start_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
+    start_time = forms.TimeField(
+        required=False,
+        widget=forms.TimeInput(attrs={"type": "time"}),
+        help_text="Leave the times empty for whole days.",
+    )
+    end_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
+    end_time = forms.TimeField(required=False, widget=forms.TimeInput(attrs={"type": "time"}))
+    reason = forms.CharField(max_length=120, required=False)
+
+    def __init__(self, *args, staff, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.staff = staff
+
+    def clean(self):
+        cleaned = super().clean()
+        start_date, end_date = cleaned.get("start_date"), cleaned.get("end_date")
+        if not start_date or not end_date:
+            return cleaned
+        tz = self.staff.business.tz
+        start_time = cleaned.get("start_time") or time(0)
+        start = datetime.combine(start_date, start_time, tzinfo=tz)
+        if cleaned.get("end_time"):
+            end = datetime.combine(end_date, cleaned["end_time"], tzinfo=tz)
+        else:
+            # A whole day off runs until midnight at the end of that day.
+            end = datetime.combine(end_date + timedelta(days=1), time(0), tzinfo=tz)
+        if end <= start:
+            raise forms.ValidationError("Time off has to end after it starts.")
+        cleaned["start"], cleaned["end"] = start, end
+        return cleaned
+
+    def save(self):
+        return TimeOff.objects.create(
+            staff=self.staff,
+            start=self.cleaned_data["start"],
+            end=self.cleaned_data["end"],
+            reason=self.cleaned_data["reason"],
         )
