@@ -33,6 +33,8 @@ class Shift:
 @dataclass(frozen=True)
 class ServiceSpec:
     duration: timedelta
+    buffer_before: timedelta = timedelta(0)
+    buffer_after: timedelta = timedelta(0)
 
 
 @dataclass
@@ -68,15 +70,13 @@ def staff_slots(schedule, service, day, tz, *, interval, earliest=None):
             end = start + service.duration
             if end >= window_end:
                 break
-            if earliest is None or start >= earliest:
+            # The buffers have to be free as well, but may run outside working hours.
+            occupied = Interval(start - service.buffer_before, end + service.buffer_after)
+            free = not any(occupied.overlaps(busy) for busy in schedule.busy)
+            if (earliest is None or start >= earliest) and free:
                 slots.append(Slot(start, end, schedule.staff_id))
             start += interval
-    return [slot for slot in slots if not _blocked(slot, schedule.busy)]
-
-
-def _blocked(slot, busy):
-    period = Interval(slot.start, slot.end)
-    return any(period.overlaps(other) for other in busy)
+    return slots
 
 
 def days_between(first: date, last: date):
