@@ -88,3 +88,47 @@ def test_nothing_before_the_earliest_start():
     )
 
     assert starts(slots)[0] == "13:30"
+
+
+def test_buffers_keep_a_gap_after_other_bookings():
+    # A booking 10:00-11:00 with 15 minutes to clean up afterwards.
+    booked = Interval(at(MONDAY, 10), at(MONDAY, 11, 15))
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(13)), busy=[booked]),
+        ServiceSpec(HALF_HOUR),
+        MONDAY,
+        LONDON,
+        interval=timedelta(minutes=15),
+    )
+
+    assert "11:00" not in starts(slots)
+    assert "11:30" in starts(slots)
+
+
+def test_own_buffers_must_be_free_too():
+    booked = Interval(at(MONDAY, 11), at(MONDAY, 12))
+    spec = ServiceSpec(HALF_HOUR, buffer_before=timedelta(minutes=15), buffer_after=HALF_HOUR)
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(14)), busy=[booked]),
+        spec,
+        MONDAY,
+        LONDON,
+        interval=timedelta(minutes=15),
+    )
+
+    # 09:45 sets up from 09:30 and cleans up until 10:45, before the booking.
+    assert "09:45" in starts(slots)
+    # 10:15 would clean up until 11:15, into the booking.
+    assert "10:15" not in starts(slots)
+    # 12:00 needs 11:45 to set up, during the booking.
+    assert "12:00" not in starts(slots)
+    assert "12:30" in starts(slots)
+
+
+def test_buffer_may_run_past_the_end_of_the_shift():
+    spec = ServiceSpec(HALF_HOUR, buffer_after=HALF_HOUR)
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(10))), spec, MONDAY, LONDON, interval=HALF_HOUR
+    )
+
+    assert starts(slots)[0] == "09:00"
