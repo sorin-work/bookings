@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ business.name }} · Book online{% endblock %}
+{% block body_class %}public{% endblock %}
+{% block body %}
+<main class="container">
+  <header class="public-header">
+    <a href="{% url 'appointments:business' business.slug %}" class="brand">{{ business.name }}</a>
+  </header>
+  {% include "includes/messages.html" %}
+  {% block content %}{% endblock %}
+</main>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "appointments/public_base.html" %}
+{% load ui %}
+{% block content %}
+<h1>Book an appointment</h1>
+{% if business.description %}<p>{{ business.description|linebreaksbr }}</p>{% endif %}
+{% if services %}
+<div class="service-list">
+  {% for service in services %}
+  <div class="card service-item">
+    <div>
+      <h2>{{ service.name }}</h2>
+      <div class="service-meta">{{ service.duration_minutes|duration }} · {{ service.price|money }}</div>
+      {% if service.description %}<p class="small">{{ service.description }}</p>{% endif %}
+    </div>
+    <span class="muted small">Online booking opens soon</span>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty">{{ business.name }} isn't taking bookings online yet.</div>
+{% endif %}
+{% endblock %}

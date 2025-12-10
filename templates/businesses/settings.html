@@ -4,6 +4,11 @@
 <div class="page-header">
   <h1>Settings</h1>
 </div>
+<p class="muted">Your booking page:
+  {% with url=request.scheme|add:"://"|add:request.get_host %}
+  <a href="{% url 'appointments:business' business.slug %}">{{ url }}{% url 'appointments:business' business.slug %}</a>
+  {% endwith %}
+</p>
 <form method="post" class="card form" novalidate>
   {% csrf_token %}
   {% include "includes/form_errors.html" %}

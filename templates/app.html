@@ -12,6 +12,7 @@
       {% nav_link "businesses:settings" "Settings" %}
     </nav>
     <div class="sidebar-footer">
+      {% if business %}<a href="{% url 'appointments:business' business.slug %}" target="_blank" rel="noopener">View booking page ↗</a>{% endif %}
       <span class="muted">{{ user.email }}</span>
       <form method="post" action="{% url 'accounts:logout' %}">
         {% csrf_token %}

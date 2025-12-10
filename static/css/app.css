@@ -133,3 +133,13 @@ input[type="checkbox"] { width: auto; }
 .hours-day { display: grid; grid-template-columns: 120px 1fr; gap: 1rem; align-items: start; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
 .hours-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.4rem; }
 .hours-row input[type="time"] { width: 8rem; }
+
+/* Public booking pages */
+.public { --accent: var(--primary); }
+.public .button-primary { background: var(--accent); border-color: var(--accent); }
+.public-header { margin-bottom: 1.5rem; }
+.public-header h1 { margin-bottom: 0.25rem; }
+.service-list { display: grid; gap: 0.75rem; }
+.service-item { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.service-item h2 { margin: 0 0 0.2rem; font-size: 1.05rem; }
+.service-meta { color: var(--muted); font-size: 0.9rem; }
