@@ -3,6 +3,9 @@
 {% block content %}
 <h1>Book an appointment</h1>
 {% if business.description %}<p>{{ business.description|linebreaksbr }}</p>{% endif %}
+{% if business.address or business.phone %}
+<p class="muted">{{ business.address }}{% if business.address and business.phone %} · {% endif %}{% if business.phone %}<a href="tel:{{ business.phone }}">{{ business.phone }}</a>{% endif %}</p>
+{% endif %}
 {% if services %}
 <div class="service-list">
   {% for service in services %}
