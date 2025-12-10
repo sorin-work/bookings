@@ -1,0 +1,10 @@
+<h2 class="small muted">{{ day|date:"l j F" }}</h2>
+{% if times %}
+<div class="slots">
+  {% for time in times %}
+  <span class="button">{{ time|date:"H:i" }}</span>
+  {% endfor %}
+</div>
+{% else %}
+<p class="muted">No free times on this day.</p>
+{% endif %}

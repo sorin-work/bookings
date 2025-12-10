@@ -12,7 +12,7 @@
       <div class="service-meta">{{ service.duration_minutes|duration }} · {{ service.price|money }}</div>
       {% if service.description %}<p class="small">{{ service.description }}</p>{% endif %}
     </div>
-    <span class="muted small">Online booking opens soon</span>
+    <a class="button button-primary" href="{% url 'appointments:service' business.slug service.pk %}">Book</a>
   </div>
   {% endfor %}
 </div>

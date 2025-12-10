@@ -1,0 +1,17 @@
+<div class="slot-picker card">
+  <div class="date-strip" role="tablist">
+    {% for day, free in days %}
+    <button type="button" role="tab"
+      class="{% if day == selected %}is-selected{% endif %}"
+      hx-get="{{ slots_url }}?date={{ day|date:'Y-m-d' }}{% if staff and not reschedule %}&amp;staff={{ staff.pk }}{% endif %}"
+      hx-target="#slots"
+      hx-swap="innerHTML"
+      onclick="this.parentNode.querySelectorAll('button').forEach(b => b.classList.remove('is-selected')); this.classList.add('is-selected')">
+      <span class="weekday">{{ day|date:"D" }}</span>{{ day|date:"j M" }}
+    </button>
+    {% endfor %}
+  </div>
+  <div id="slots">
+    {% include "appointments/includes/slots.html" %}
+  </div>
+</div>

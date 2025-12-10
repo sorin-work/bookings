@@ -143,3 +143,11 @@ input[type="checkbox"] { width: auto; }
 .service-item { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .service-item h2 { margin: 0 0 0.2rem; font-size: 1.05rem; }
 .service-meta { color: var(--muted); font-size: 0.9rem; }
+.slot-picker { display: grid; gap: 1rem; }
+.date-strip { display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.25rem; }
+.date-strip button { min-width: 4.2rem; text-align: center; line-height: 1.2; padding: 0.4rem; }
+.date-strip button.is-selected { border-color: var(--accent, var(--primary)); background: var(--accent, var(--primary)); color: #fff; }
+.date-strip .weekday { display: block; font-size: 0.75rem; text-transform: uppercase; }
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 0.5rem; }
+.slots a { text-align: center; }
+.htmx-request.slots, .htmx-request .slots { opacity: 0.5; }

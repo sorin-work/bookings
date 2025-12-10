@@ -1,0 +1,19 @@
+{% extends "appointments/public_base.html" %}
+{% load ui %}
+{% block content %}
+<p><a href="{% url 'appointments:business' business.slug %}">← All services</a></p>
+<h1>{{ service.name }}</h1>
+<p class="muted">{{ service.duration_minutes|duration }} · {{ service.price|money }}</p>
+{% if staff_options|length > 1 %}
+<form method="get" class="field" style="max-width: 320px">
+  <label for="staff">With</label>
+  <select id="staff" name="staff" onchange="this.form.submit()">
+    {% for member in staff_options %}
+    <option value="{{ member.pk }}" {% if staff and member.pk == staff.pk %}selected{% endif %}>{{ member.name }}</option>
+    {% endfor %}
+  </select>
+  <noscript><button type="submit">Show times</button></noscript>
+</form>
+{% endif %}
+{% include "appointments/includes/slot_picker.html" %}
+{% endblock %}
