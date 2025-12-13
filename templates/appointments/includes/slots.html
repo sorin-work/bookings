@@ -2,7 +2,7 @@
 {% if times %}
 <div class="slots">
   {% for time in times %}
-  <span class="button">{{ time|date:"H:i" }}</span>
+  <a class="button" href="{{ book_url }}?start={{ time.isoformat|urlencode }}{% if staff %}&amp;staff={{ staff.pk }}{% endif %}">{{ time|date:"H:i" }}</a>
   {% endfor %}
 </div>
 {% else %}

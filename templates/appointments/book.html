@@ -1,0 +1,25 @@
+{% extends "appointments/public_base.html" %}
+{% load ui %}
+{% block content %}
+<p><a href="{{ back_url }}">← Pick another time</a></p>
+<h1>Your details</h1>
+<div class="card booking-summary" style="margin-bottom: 1rem">
+  <dl>
+    <dt>Service</dt><dd>{{ service.name }} ({{ service.duration_minutes|duration }}, {{ service.price|money }})</dd>
+    <dt>When</dt><dd>{{ start|date:"l j F Y" }}, {{ start|date:"H:i" }}–{{ end|date:"H:i" }}</dd>
+    <dt>With</dt><dd>{% if staff %}{{ staff.name }}{% else %}Anyone available{% endif %}</dd>
+  </dl>
+</div>
+<form method="post" class="card form" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="start" value="{{ start.isoformat }}">
+  {% if staff %}<input type="hidden" name="staff" value="{{ staff.pk }}">{% endif %}
+  {% include "includes/form_errors.html" %}
+  {% include "includes/field.html" with field=form.name %}
+  {% include "includes/field.html" with field=form.email %}
+  {% include "includes/field.html" with field=form.phone %}
+  <div class="actions">
+    <button type="submit" class="button button-primary">{% if business.require_confirmation %}Request booking{% else %}Book{% endif %}</button>
+  </div>
+</form>
+{% endblock %}

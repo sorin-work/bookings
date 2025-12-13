@@ -1,0 +1,8 @@
+{% extends "appointments/public_base.html" %}
+{% block content %}
+<h1>You're booked in</h1>
+<div class="card">
+  <p>{{ booking.service.name }} with {{ booking.staff.name }} on {{ booking.start|date:"l j F Y" }} at {{ booking.start|date:"H:i" }}.</p>
+  <p class="muted">Your booking reference is <strong>{{ booking.reference }}</strong>.</p>
+</div>
+{% endblock %}

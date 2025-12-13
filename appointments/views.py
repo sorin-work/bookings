@@ -1,14 +1,17 @@
 """Public pages: the booking page of each business and the customer's booking link."""
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
 from businesses.models import Business, StaffMember
 from scheduling import availability
+
+from . import services
+from .forms import CustomerForm
 
 
 def _business(slug):
@@ -82,6 +85,7 @@ def service_page(request, slug, service_id):
         "staff": staff,
         "staff_options": availability.bookable_staff(service),
         "slots_url": reverse("appointments:slots", args=[business.slug, service.pk]),
+        "book_url": reverse("appointments:book", args=[business.slug, service.pk]),
         **_picker(service, staff, _parse_day(request.GET.get("date"))),
     }
     return render(request, "appointments/service.html", context)
@@ -97,6 +101,53 @@ def slots(request, slug, service_id):
         "business": business,
         "service": service,
         "staff": staff,
+        "book_url": reverse("appointments:book", args=[business.slug, service.pk]),
         **_times(service, staff, day),
     }
     return render(request, "appointments/includes/slots.html", context)
+
+
+def _parse_start(value):
+    try:
+        start = datetime.fromisoformat(value)
+    except (TypeError, ValueError) as exc:
+        raise Http404("Pick a time.") from exc
+    if start.tzinfo is None:
+        raise Http404("Pick a time.")
+    return start
+
+
+def _is_free(service, staff, start):
+    return availability.is_available(service, staff, start)
+
+
+def book(request, slug, service_id):
+    business = _business(slug)
+    service = _service(business, service_id)
+    staff = _staff(request, business, service)
+    start = _parse_start(request.GET.get("start") or request.POST.get("start"))
+    back_url = reverse("appointments:service", args=[business.slug, service.pk])
+    back_url += f"?date={start.astimezone(business.tz).date().isoformat()}"
+    if staff:
+        back_url += f"&staff={staff.pk}"
+    if not _is_free(service, staff, start):
+        return redirect(back_url)
+
+    form = CustomerForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            booking = services.create_booking(service, start, form.customer(), staff)
+        except services.SlotUnavailable:
+            return redirect(back_url)
+        context = {"business": business, "booking": booking}
+        return render(request, "appointments/booked.html", context)
+    context = {
+        "business": business,
+        "service": service,
+        "staff": staff,
+        "start": start,
+        "end": start + timedelta(minutes=service.duration_minutes),
+        "form": form,
+        "back_url": back_url,
+    }
+    return render(request, "appointments/book.html", context)
