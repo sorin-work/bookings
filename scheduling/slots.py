@@ -18,7 +18,9 @@ class Interval:
     end: datetime
 
     def overlaps(self, other):
-        return self.start <= other.end and other.start <= self.end
+        # Touching intervals don't overlap: one appointment can end at 10:00 and the
+        # next start at 10:00.
+        return self.start < other.end and other.start < self.end
 
 
 @dataclass(frozen=True)

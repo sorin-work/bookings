@@ -132,3 +132,23 @@ def test_buffer_may_run_past_the_end_of_the_shift():
     )
 
     assert starts(slots)[0] == "09:00"
+
+
+def test_back_to_back_appointments_are_allowed():
+    booked = Interval(at(MONDAY, 10), at(MONDAY, 11))
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(13)), busy=[booked]),
+        ServiceSpec(HOUR),
+        MONDAY,
+        LONDON,
+        interval=HOUR,
+    )
+
+    assert starts(slots)[:2] == ["09:00", "11:00"]
+
+
+def test_touching_intervals_do_not_overlap():
+    first = Interval(at(MONDAY, 9), at(MONDAY, 10))
+
+    assert not first.overlaps(Interval(at(MONDAY, 10), at(MONDAY, 11)))
+    assert first.overlaps(Interval(at(MONDAY, 9, 59), at(MONDAY, 11)))
