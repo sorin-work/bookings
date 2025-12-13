@@ -8,6 +8,7 @@
 <form method="get" class="field" style="max-width: 320px">
   <label for="staff">With</label>
   <select id="staff" name="staff" onchange="this.form.submit()">
+    <option value="">Anyone available</option>
     {% for member in staff_options %}
     <option value="{{ member.pk }}" {% if staff and member.pk == staff.pk %}selected{% endif %}>{{ member.name }}</option>
     {% endfor %}

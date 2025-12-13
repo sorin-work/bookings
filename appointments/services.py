@@ -1,10 +1,14 @@
 """Everything that creates a booking or changes its state goes through here."""
 
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 
 from django.db import transaction
+from django.db.models import Count, Q
 from django.utils import timezone
+
+from businesses.models import StaffMember
+from scheduling import availability
 
 from .models import Booking
 
@@ -20,7 +24,37 @@ class Customer:
     phone: str
 
 
-def create_booking(service, start, customer, staff, *, now=None):
+def _day_bounds(business, start):
+    day = start.astimezone(business.tz).date()
+    first = datetime.combine(day, time(0), tzinfo=business.tz)
+    return first, first + timedelta(days=1)
+
+
+def _least_busy_first(business, members, start):
+    """Spread "anyone available" bookings: the member with the fewest bookings that day first."""
+    day_start, day_end = _day_bounds(business, start)
+    counts = dict(
+        StaffMember.objects.filter(pk__in=[m.pk for m in members])
+        .annotate(
+            n=Count(
+                "bookings",
+                filter=Q(bookings__start__gte=day_start, bookings__start__lt=day_end)
+                & ~Q(bookings__status__in=Booking.CLOSED_STATUSES),
+            )
+        )
+        .values_list("pk", "n")
+    )
+    return sorted(members, key=lambda m: (counts.get(m.pk, 0), m.name, m.pk))
+
+
+def free_staff(service, start, staff=None, now=None):
+    """Staff who can take `service` at `start`, least busy first."""
+    candidates = [staff] if staff else list(availability.bookable_staff(service))
+    free = [m for m in candidates if availability.is_available(service, m, start, now=now)]
+    return _least_busy_first(service.business, free, start)
+
+
+def create_booking(service, start, customer, staff=None, *, now=None):
     """Book `service` at `start` (an aware datetime).
 
     Without `staff`, whoever is free and least busy that day gets the booking.
@@ -28,6 +62,11 @@ def create_booking(service, start, customer, staff, *, now=None):
     """
     business = service.business
     now = now or timezone.now()
+    if staff is None:
+        free = free_staff(service, start, now=now)
+        if not free:
+            raise SlotUnavailable
+        staff = free[0]
     with transaction.atomic():
         booking = Booking.objects.create(
             business=business,

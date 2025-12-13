@@ -38,14 +38,11 @@ def _service(business, service_id):
 
 
 def _staff(request, business, service):
-    """The staff member from ?staff=, or the first one who offers the service."""
+    """The staff member from ?staff=, or None for "anyone available"."""
     staff_id = request.GET.get("staff") or request.POST.get("staff")
-    staff_qs = availability.bookable_staff(service)
     if not staff_id:
-        member = staff_qs.first()
-        if member is None:
-            raise Http404("Nobody offers this service yet.")
-        return member
+        return None
+    staff_qs = availability.bookable_staff(service)
     try:
         return staff_qs.get(pk=int(staff_id))
     except (ValueError, StaffMember.DoesNotExist) as exc:
@@ -71,7 +68,7 @@ def _picker(service, staff, selected=None):
 
 def _times(service, staff, day):
     slots = availability.available_slots(service, day, staff=staff)
-    times = [slot.start for slot in slots]
+    times = [slot.start for slot in slots] if staff else availability.start_times(slots)
     return {"day": day, "times": times}
 
 
@@ -118,7 +115,9 @@ def _parse_start(value):
 
 
 def _is_free(service, staff, start):
-    return availability.is_available(service, staff, start)
+    if staff is not None:
+        return availability.is_available(service, staff, start)
+    return bool(services.free_staff(service, start))
 
 
 def book(request, slug, service_id):
