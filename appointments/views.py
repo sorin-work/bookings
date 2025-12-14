@@ -7,12 +7,14 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from businesses.models import Business, StaffMember
 from scheduling import availability
 
 from . import services
 from .forms import CustomerForm
+from .models import Booking
 from .tokens import booking_for_token
 
 
@@ -173,3 +175,12 @@ def manage(request, token):
         "can_change": booking.is_open,
     }
     return render(request, "appointments/manage.html", context)
+
+
+@require_POST
+def manage_cancel(request, token):
+    booking = _booking(token)
+    if booking.is_open:
+        services.cancel_booking(booking, Booking.CancelledBy.CUSTOMER)
+        messages.success(request, "Your booking is cancelled.")
+    return redirect(booking.manage_url)

@@ -82,3 +82,11 @@ def create_booking(service, start, customer, staff=None, *, now=None):
             customer_phone=customer.phone,
         )
     return booking
+
+
+def cancel_booking(booking, by, *, now=None):
+    booking.status = Booking.Status.CANCELLED
+    booking.cancelled_at = now or timezone.now()
+    booking.cancelled_by = by
+    booking.save(update_fields=["status", "cancelled_at", "cancelled_by", "updated_at"])
+    return booking

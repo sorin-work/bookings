@@ -17,6 +17,13 @@
     <dt>Name</dt><dd>{{ booking.customer_name }}</dd>
     {% if business.address %}<dt>Where</dt><dd>{{ business.address }}</dd>{% endif %}
   </dl>
+  <div class="actions">
+    {% if can_change %}
+    <form method="post" action="{% url 'appointments:manage_cancel' token %}" onsubmit="return confirm('Cancel this booking?')">
+      {% csrf_token %}<button type="submit" class="button button-danger">Cancel booking</button>
+    </form>
+    {% endif %}
+  </div>
 </div>
 <p class="muted small" style="margin-top: 1rem">Keep this page's address (or the email) to come back to your booking. <a href="{% url 'appointments:business' business.slug %}">Book something else</a></p>
 {% endblock %}
