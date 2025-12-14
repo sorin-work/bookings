@@ -2,7 +2,15 @@
 {% if times %}
 <div class="slots">
   {% for time in times %}
+  {% if reschedule %}
+  <form method="post" action="{% url 'appointments:manage_reschedule' token %}">
+    {% csrf_token %}
+    <input type="hidden" name="start" value="{{ time.isoformat }}">
+    <button type="submit" style="width: 100%">{{ time|date:"H:i" }}</button>
+  </form>
+  {% else %}
   <a class="button" href="{{ book_url }}?start={{ time.isoformat|urlencode }}{% if staff %}&amp;staff={{ staff.pk }}{% endif %}">{{ time|date:"H:i" }}</a>
+  {% endif %}
   {% endfor %}
 </div>
 {% else %}

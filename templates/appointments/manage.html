@@ -19,6 +19,7 @@
   </dl>
   <div class="actions">
     {% if can_change %}
+    <a class="button" href="{% url 'appointments:manage_reschedule' token %}">Change time</a>
     <form method="post" action="{% url 'appointments:manage_cancel' token %}" onsubmit="return confirm('Cancel this booking?')">
       {% csrf_token %}<button type="submit" class="button button-danger">Cancel booking</button>
     </form>

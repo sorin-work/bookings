@@ -90,3 +90,16 @@ def cancel_booking(booking, by, *, now=None):
     booking.cancelled_by = by
     booking.save(update_fields=["status", "cancelled_at", "cancelled_by", "updated_at"])
     return booking
+
+
+def reschedule_booking(booking, start, *, now=None):
+    """Move a booking to a new start time with the same staff member."""
+    now = now or timezone.now()
+    with transaction.atomic():
+        if not availability.is_available(booking.service, booking.staff, start, now=now):
+            raise SlotUnavailable
+        duration = booking.end - booking.start
+        booking.start = start
+        booking.end = start + duration
+        booking.save(update_fields=["start", "end", "updated_at"])
+    return booking

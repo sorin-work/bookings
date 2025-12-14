@@ -184,3 +184,39 @@ def manage_cancel(request, token):
         services.cancel_booking(booking, Booking.CancelledBy.CUSTOMER)
         messages.success(request, "Your booking is cancelled.")
     return redirect(booking.manage_url)
+
+
+def manage_reschedule(request, token):
+    booking = _booking(token)
+    if request.method == "POST":
+        start = _parse_start(request.POST.get("start"))
+        try:
+            services.reschedule_booking(booking, start)
+        except services.SlotUnavailable:
+            messages.error(request, "Sorry, that time isn't free any more. Please pick another.")
+        else:
+            messages.success(request, "Your booking has been moved.")
+            return redirect(booking.manage_url)
+    context = {
+        "booking": booking,
+        "business": booking.business,
+        "service": booking.service,
+        "staff": booking.staff,
+        "token": token,
+        "slots_url": reverse("appointments:manage_reschedule_slots", args=[token]),
+        **_picker(booking.service, booking.staff, _parse_day(request.GET.get("date"))),
+    }
+    return render(request, "appointments/reschedule.html", context)
+
+
+def manage_reschedule_slots(request, token):
+    booking = _booking(token)
+    day = _parse_day(request.GET.get("date"))
+    context = {
+        "booking": booking,
+        "business": booking.business,
+        "token": token,
+        "reschedule": True,
+        **_times(booking.service, booking.staff, day),
+    }
+    return render(request, "appointments/includes/slots.html", context)
