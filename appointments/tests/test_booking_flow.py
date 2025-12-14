@@ -70,7 +70,8 @@ def test_book_a_time(client, business, service, staff):
     response = client.post(book_url(business, service, start, staff), customer_data())
 
     booking = Booking.objects.get()
-    assert response.status_code == 200
+    assert response.status_code == 302
+    assert response["Location"] == f"{booking.manage_url}?new=1"
     assert booking.start == start
     assert booking.staff == staff
     assert booking.customer_email == "ana@example.com"

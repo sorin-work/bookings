@@ -1,0 +1,22 @@
+{% extends "appointments/public_base.html" %}
+{% load ui %}
+{% block content %}
+{% if is_new %}
+<h1>You're booked in</h1>
+{% else %}
+<h1>Your booking</h1>
+{% endif %}
+
+<div class="card booking-summary">
+  <dl>
+    <dt>Reference</dt><dd><strong>{{ booking.reference }}</strong></dd>
+    <dt>Status</dt><dd class="status-{{ booking.status }}">{{ booking.get_status_display }}</dd>
+    <dt>Service</dt><dd>{{ booking.service.name }} ({{ booking.duration_minutes|duration }}, {{ booking.price|money }})</dd>
+    <dt>When</dt><dd>{{ booking.start|date:"l j F Y" }}, {{ booking.start|date:"H:i" }}–{{ booking.end|date:"H:i" }}</dd>
+    <dt>With</dt><dd>{{ booking.staff.name }}</dd>
+    <dt>Name</dt><dd>{{ booking.customer_name }}</dd>
+    {% if business.address %}<dt>Where</dt><dd>{{ business.address }}</dd>{% endif %}
+  </dl>
+</div>
+<p class="muted small" style="margin-top: 1rem">Keep this page's address (or the email) to come back to your booking. <a href="{% url 'appointments:business' business.slug %}">Book something else</a></p>
+{% endblock %}

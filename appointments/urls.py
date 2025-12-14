@@ -9,4 +9,5 @@ urlpatterns = [
     path("b/<slug:slug>/<int:service_id>/", views.service_page, name="service"),
     path("b/<slug:slug>/<int:service_id>/slots/", views.slots, name="slots"),
     path("b/<slug:slug>/<int:service_id>/book/", views.book, name="book"),
+    path("m/<str:token>/", views.manage, name="manage"),
 ]

@@ -2,6 +2,7 @@
 
 from datetime import date, datetime, timedelta
 
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -12,6 +13,7 @@ from scheduling import availability
 
 from . import services
 from .forms import CustomerForm
+from .tokens import booking_for_token
 
 
 def _business(slug):
@@ -130,6 +132,7 @@ def book(request, slug, service_id):
     if staff:
         back_url += f"&staff={staff.pk}"
     if not _is_free(service, staff, start):
+        messages.error(request, "Sorry, that time isn't free any more. Please pick another.")
         return redirect(back_url)
 
     form = CustomerForm(request.POST or None)
@@ -137,9 +140,11 @@ def book(request, slug, service_id):
         try:
             booking = services.create_booking(service, start, form.customer(), staff)
         except services.SlotUnavailable:
+            messages.error(
+                request, "Sorry, someone booked that time a moment ago. Please pick another."
+            )
             return redirect(back_url)
-        context = {"business": business, "booking": booking}
-        return render(request, "appointments/booked.html", context)
+        return redirect(f"{booking.manage_url}?new=1")
     context = {
         "business": business,
         "service": service,
@@ -150,3 +155,21 @@ def book(request, slug, service_id):
         "back_url": back_url,
     }
     return render(request, "appointments/book.html", context)
+
+
+def _booking(token):
+    booking = booking_for_token(token)
+    timezone.activate(booking.business.tz)
+    return booking
+
+
+def manage(request, token):
+    booking = _booking(token)
+    context = {
+        "booking": booking,
+        "business": booking.business,
+        "token": token,
+        "is_new": request.GET.get("new") == "1",
+        "can_change": booking.is_open,
+    }
+    return render(request, "appointments/manage.html", context)

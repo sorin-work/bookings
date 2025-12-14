@@ -151,3 +151,6 @@ input[type="checkbox"] { width: auto; }
 .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 0.5rem; }
 .slots a { text-align: center; }
 .htmx-request.slots, .htmx-request .slots { opacity: 0.5; }
+.booking-summary dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0; }
+.booking-summary dt { color: var(--muted); }
+.booking-summary dd { margin: 0; }

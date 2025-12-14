@@ -84,3 +84,9 @@ class Booking(models.Model):
     def is_open(self):
         """Still going ahead: not cancelled, expired, completed or a no-show."""
         return self.status == self.Status.CONFIRMED
+
+    @property
+    def manage_url(self):
+        from .tokens import manage_path
+
+        return manage_path(self)
