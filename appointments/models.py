@@ -17,7 +17,7 @@ def new_reference():
 class BookingQuerySet(models.QuerySet):
     def blocking(self):
         """Bookings that take up the staff member's time."""
-        return self
+        return self.exclude(status=Booking.Status.CANCELLED)
 
 
 class Booking(models.Model):

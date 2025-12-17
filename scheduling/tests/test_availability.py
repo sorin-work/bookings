@@ -2,6 +2,7 @@ from datetime import time
 
 import pytest
 
+from appointments.models import Booking
 from businesses.models import StaffMember, TimeOff, WorkingHours
 from scheduling import availability
 from testutils import LONDON, at, make_booking, next_weekday
@@ -76,3 +77,10 @@ def test_is_available(service, staff):
     assert availability.is_available(service, staff, at(monday, 14))
     assert not availability.is_available(service, staff, at(monday, 10, 15))
     assert not availability.is_available(service, staff, at(monday, 14, 5))  # not on the grid
+
+
+def test_cancelled_bookings_do_not_block(service, staff):
+    monday = next_weekday(0)
+    make_booking(service, staff, at(monday, 10), status=Booking.Status.CANCELLED)
+
+    assert availability.is_available(service, staff, at(monday, 10))
