@@ -3,6 +3,7 @@
 {% block content %}
 {% if is_new %}
 <h1>You're booked in</h1>
+<p>A confirmation is on its way to <strong>{{ booking.customer_email }}</strong>.</p>
 {% else %}
 <h1>Your booking</h1>
 {% endif %}

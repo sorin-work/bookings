@@ -8,6 +8,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 
 from businesses.models import StaffMember
+from notifications import emails
 from scheduling import availability
 
 from .models import Booking
@@ -81,6 +82,7 @@ def create_booking(service, start, customer, staff=None, *, now=None):
             customer_email=customer.email,
             customer_phone=customer.phone,
         )
+        emails.booking_created(booking)
     return booking
 
 

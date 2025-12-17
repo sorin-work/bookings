@@ -1,0 +1,5 @@
+{% autoescape off %}Service:   {{ booking.service.name }}
+When:      {{ booking.start|date:"l j F Y" }}, {{ booking.start|date:"H:i" }}–{{ booking.end|date:"H:i" }} ({{ business.timezone }})
+With:      {{ booking.staff.name }}
+Reference: {{ booking.reference }}{% if business.address %}
+Where:     {{ business.address }}{% endif %}{% endautoescape %}

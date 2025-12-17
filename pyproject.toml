@@ -20,6 +20,7 @@ known-first-party = [
     "businesses",
     "scheduling",
     "appointments",
+    "notifications",
     "dashboard",
 ]
 

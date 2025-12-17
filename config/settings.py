@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "accounts",
     "businesses",
     "appointments",
+    "notifications",
     "dashboard",
 ]
 
@@ -97,3 +98,20 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Email. Without EMAIL_HOST, messages are printed to the console.
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "25"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS")
+EMAIL_TIMEOUT = 10
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend"
+    if EMAIL_HOST
+    else "django.core.mail.backends.console.EmailBackend"
+)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Bookings <no-reply@bookings.local>")
+
+# Absolute links in emails (booking links, password resets) start with this.
+SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000").rstrip("/")
