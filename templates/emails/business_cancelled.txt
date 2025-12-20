@@ -1,0 +1,6 @@
+{% autoescape off %}{{ booking.customer_name }} cancelled their booking:
+
+{% include "emails/_business_details.txt" %}
+
+The time is free again on your booking page.
+{% endautoescape %}

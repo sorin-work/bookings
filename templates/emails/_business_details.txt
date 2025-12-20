@@ -1,0 +1,7 @@
+{% autoescape off %}Customer:  {{ booking.customer_name }}
+Email:     {{ booking.customer_email }}
+Phone:     {{ booking.customer_phone }}
+Service:   {{ booking.service.name }}
+When:      {{ booking.start|date:"l j F Y" }}, {{ booking.start|date:"H:i" }}–{{ booking.end|date:"H:i" }}
+With:      {{ booking.staff.name }}
+Reference: {{ booking.reference }}{% endautoescape %}

@@ -1,0 +1,4 @@
+{% autoescape off %}{{ booking.customer_name }}'s booking has moved from {{ old_start|date:"l j F" }} at {{ old_start|date:"H:i" }} to:
+
+{% include "emails/_business_details.txt" %}
+{% endautoescape %}

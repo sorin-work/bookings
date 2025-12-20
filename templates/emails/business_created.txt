@@ -1,0 +1,4 @@
+{% autoescape off %}New booking for {{ business.name }}:
+
+{% include "emails/_business_details.txt" %}
+{% endautoescape %}

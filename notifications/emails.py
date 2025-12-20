@@ -17,6 +17,12 @@ CUSTOMER_SUBJECTS = {
     "rescheduled": "Booking moved: {service} is now on {when}",
 }
 
+BUSINESS_SUBJECTS = {
+    "created": "New booking: {customer}, {service} on {when}",
+    "cancelled": "Cancelled: {customer}, {service} on {when}",
+    "rescheduled": "Moved: {customer}, {service} now on {when}",
+}
+
 
 def _context(booking, **extra):
     return {
@@ -57,17 +63,38 @@ def _customer(kind, booking, **extra):
         booking,
         [booking.customer_email],
         CUSTOMER_SUBJECTS[kind],
+        reply_to=[booking.business.notification_email],
+        **extra,
+    )
+
+
+def _business_recipients(booking):
+    recipients = [booking.business.notification_email]
+    return recipients
+
+
+def _business(kind, booking, **extra):
+    _send(
+        f"business_{kind}",
+        booking,
+        _business_recipients(booking),
+        BUSINESS_SUBJECTS[kind],
+        reply_to=[booking.customer_email],
         **extra,
     )
 
 
 def booking_created(booking):
     _customer("created", booking)
+    _business("created", booking)
 
 
 def booking_cancelled(booking):
     _customer("cancelled", booking)
+    if booking.cancelled_by == booking.CancelledBy.CUSTOMER:
+        _business("cancelled", booking)
 
 
 def booking_rescheduled(booking, old_start):
     _customer("rescheduled", booking, old_start=old_start)
+    _business("rescheduled", booking, old_start=old_start)
