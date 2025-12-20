@@ -1,0 +1,11 @@
+{% autoescape off %}Hi {{ booking.customer_name }},
+
+{% if booking.cancelled_by == "business" %}Sorry, {{ business.name }} had to cancel your booking.{% else %}Your booking at {{ business.name }} is cancelled.{% endif %}
+
+{% include "emails/_details.txt" %}
+
+You're welcome to book another time:
+{{ site_url }}{% url 'appointments:business' business.slug %}
+
+{{ business.name }}
+{% endautoescape %}

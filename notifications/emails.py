@@ -13,6 +13,8 @@ from appointments.tokens import absolute_url
 
 CUSTOMER_SUBJECTS = {
     "created": "Booking confirmed: {service} on {when}",
+    "cancelled": "Booking cancelled: {service} on {when}",
+    "rescheduled": "Booking moved: {service} is now on {when}",
 }
 
 
@@ -61,3 +63,11 @@ def _customer(kind, booking, **extra):
 
 def booking_created(booking):
     _customer("created", booking)
+
+
+def booking_cancelled(booking):
+    _customer("cancelled", booking)
+
+
+def booking_rescheduled(booking, old_start):
+    _customer("rescheduled", booking, old_start=old_start)

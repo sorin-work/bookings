@@ -1,0 +1,13 @@
+{% autoescape off %}Hi {{ booking.customer_name }},
+
+Your booking at {{ business.name }} has moved to a new time.
+
+{% include "emails/_details.txt" %}
+
+It was on {{ old_start|date:"l j F" }} at {{ old_start|date:"H:i" }}.
+
+To change or cancel your booking, use this link:
+{{ manage_url }}
+
+{{ business.name }}
+{% endautoescape %}
