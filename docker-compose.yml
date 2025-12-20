@@ -17,5 +17,16 @@ services:
       timeout: 3s
       retries: 10
 
+  mailpit:
+    image: axllent/mailpit:v1.27
+    # Only the web UI is published; the app reaches SMTP on the compose network.
+    ports:
+      - '${MAILPIT_UI_PORT:-8026}:8025'
+    healthcheck:
+      test: ['CMD', '/mailpit', 'readyz']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
 volumes:
   db-data:
