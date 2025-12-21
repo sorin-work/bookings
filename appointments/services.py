@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from datetime import datetime, time, timedelta
+from functools import partial
 
 from django.db import transaction
 from django.db.models import Count, Q
@@ -23,6 +24,11 @@ class Customer:
     name: str
     email: str
     phone: str
+
+
+def _after_commit(func, *args):
+    """Send notifications once the change is saved, never for a rolled back one."""
+    transaction.on_commit(partial(func, *args))
 
 
 def _day_bounds(business, start):
@@ -82,7 +88,7 @@ def create_booking(service, start, customer, staff=None, *, now=None):
             customer_email=customer.email,
             customer_phone=customer.phone,
         )
-        emails.booking_created(booking)
+        _after_commit(emails.booking_created, booking)
     return booking
 
 
@@ -91,7 +97,7 @@ def cancel_booking(booking, by, *, now=None):
     booking.cancelled_at = now or timezone.now()
     booking.cancelled_by = by
     booking.save(update_fields=["status", "cancelled_at", "cancelled_by", "updated_at"])
-    emails.booking_cancelled(booking)
+    _after_commit(emails.booking_cancelled, booking)
     return booking
 
 
@@ -106,5 +112,5 @@ def reschedule_booking(booking, start, *, now=None):
         booking.start = start
         booking.end = start + duration
         booking.save(update_fields=["start", "end", "updated_at"])
-        emails.booking_rescheduled(booking, old_start)
+        _after_commit(emails.booking_rescheduled, booking, old_start)
     return booking

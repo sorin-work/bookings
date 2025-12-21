@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from django.core import mail
 
@@ -77,3 +79,22 @@ def test_moving_emails_the_new_and_old_time(send, service, staff):
     to_customer = next(m for m in sent if m.to == ["ana@example.com"])
     assert "14:00" in to_customer.subject
     assert "10:00" in to_customer.body
+
+
+def test_emails_wait_for_the_commit(django_capture_on_commit_callbacks, service, staff):
+    mail.outbox.clear()
+    with django_capture_on_commit_callbacks(execute=False) as callbacks:
+        services.create_booking(service, at(next_weekday(0), 10), customer(), staff)
+
+    assert mail.outbox == []
+    assert len(callbacks) == 1
+
+
+def test_a_failing_mail_server_does_not_lose_the_booking(send, service, staff, caplog):
+    with mock.patch("django.core.mail.EmailMessage.send", side_effect=OSError("refused")):
+        booking, sent = send(
+            services.create_booking, service, at(next_weekday(0), 10), customer(), staff
+        )
+
+    assert Booking.objects.filter(pk=booking.pk).exists()
+    assert "Could not send customer_created email" in caplog.text

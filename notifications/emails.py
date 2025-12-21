@@ -4,12 +4,16 @@ Each message has a plain text template under templates/emails/ and is rendered
 in the business's time zone.
 """
 
+import logging
+
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils import timezone
 
 from appointments.tokens import absolute_url
+
+logger = logging.getLogger(__name__)
 
 CUSTOMER_SUBJECTS = {
     "created": "Booking confirmed: {service} on {when}",
@@ -54,7 +58,11 @@ def _send(name, booking, to, subject, *, reply_to=None, **extra):
         to=to,
         reply_to=reply_to,
     )
-    message.send()
+    try:
+        message.send()
+    except Exception:
+        # A mail server hiccup shouldn't undo or break the booking itself.
+        logger.exception("Could not send %s email for booking %s", name, booking.reference)
 
 
 def _customer(kind, booking, **extra):
