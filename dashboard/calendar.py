@@ -112,3 +112,15 @@ def day_grid(business, day, staff):
     columns = [Column(label=member.name, day=day, staff=member) for member in staff]
     grid = Grid(columns, start_hour, end_hour)
     return _fill(grid, business, bookings)
+
+
+def week_grid(business, day, staff):
+    """One column per day of `day`'s week, Monday first."""
+    staff = list(staff)
+    monday = week_start(day)
+    days = [monday + timedelta(days=i) for i in range(7)]
+    bookings = _bookings(business, staff, days[0], days[-1])
+    start_hour, end_hour = _visible_hours(staff, days, bookings, business.tz)
+    columns = [Column(label=f"{d:%a %d}", day=d) for d in days]
+    grid = Grid(columns, start_hour, end_hour)
+    return _fill(grid, business, bookings)

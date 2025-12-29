@@ -21,11 +21,15 @@ def _parse_day(value, default):
 def calendar_view(request):
     business = request.business
     day = _parse_day(request.GET.get("date"), business.today())
-    view = "day"
+    view = request.GET.get("view") if request.GET.get("view") in ("day", "week") else "day"
     staff = business.staff.prefetch_related("working_hours")
     shown = list(staff)
-    grid = calendar.day_grid(business, day, shown)
-    step = timedelta(days=1)
+    if view == "week":
+        grid = calendar.week_grid(business, day, shown)
+        step = timedelta(days=7)
+    else:
+        grid = calendar.day_grid(business, day, shown)
+        step = timedelta(days=1)
     context = {
         "grid": grid,
         "day": day,
@@ -33,5 +37,7 @@ def calendar_view(request):
         "today": business.today(),
         "previous_day": day - step,
         "next_day": day + step,
+        "week_start": calendar.week_start(day),
+        "week_end": calendar.week_start(day) + timedelta(days=6),
     }
     return render(request, "dashboard/calendar.html", context)

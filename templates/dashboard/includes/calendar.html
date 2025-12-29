@@ -1,10 +1,12 @@
 <div class="calendar-toolbar">
   <span class="title">
-    {{ day|date:"l j F Y" }}
+    {% if view == "week" %}{{ week_start|date:"j M" }} – {{ week_end|date:"j M Y" }}{% else %}{{ day|date:"l j F Y" }}{% endif %}
   </span>
-  <a class="button" href="?date={{ previous_day|date:'Y-m-d' }}">←</a>
-  <a class="button" href="?date={{ today|date:'Y-m-d' }}">Today</a>
-  <a class="button" href="?date={{ next_day|date:'Y-m-d' }}">→</a>
+  <a class="button" href="?view={{ view }}&amp;date={{ previous_day|date:'Y-m-d' }}">←</a>
+  <a class="button" href="?view={{ view }}&amp;date={{ today|date:'Y-m-d' }}">Today</a>
+  <a class="button" href="?view={{ view }}&amp;date={{ next_day|date:'Y-m-d' }}">→</a>
+  <a class="button{% if view == 'day' %} button-primary{% endif %}" href="?view=day&amp;date={{ day|date:'Y-m-d' }}">Day</a>
+  <a class="button{% if view == 'week' %} button-primary{% endif %}" href="?view=week&amp;date={{ day|date:'Y-m-d' }}">Week</a>
 </div>
 {% if grid.columns %}
 <div class="calendar" style="--columns: {{ grid.columns|length }}; --hours: {{ grid.hour_count }}; --hour-height: 56px">
