@@ -1,4 +1,6 @@
 {% autoescape off %}New booking for {{ business.name }}:
 
 {% include "emails/_business_details.txt" %}
+
+Calendar: {{ site_url }}{% url 'dashboard:calendar' %}?date={{ booking.start|date:"Y-m-d" }}
 {% endautoescape %}

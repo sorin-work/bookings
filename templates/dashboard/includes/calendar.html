@@ -1,0 +1,32 @@
+<div class="calendar-toolbar">
+  <span class="title">
+    {{ day|date:"l j F Y" }}
+  </span>
+  <a class="button" href="?date={{ previous_day|date:'Y-m-d' }}">←</a>
+  <a class="button" href="?date={{ today|date:'Y-m-d' }}">Today</a>
+  <a class="button" href="?date={{ next_day|date:'Y-m-d' }}">→</a>
+</div>
+{% if grid.columns %}
+<div class="calendar" style="--columns: {{ grid.columns|length }}; --hours: {{ grid.hour_count }}; --hour-height: 56px">
+  <div class="calendar-head">
+    <div></div>
+    {% for column in grid.columns %}<div>{{ column.label }}</div>{% endfor %}
+  </div>
+  <div class="calendar-body">
+    <div class="calendar-hours">{% for hour in grid.hours %}<div>{{ hour|stringformat:"02d" }}:00</div>{% endfor %}</div>
+    {% for column in grid.columns %}
+    <div class="calendar-column">
+      {% for event in column.events %}
+      <div class="calendar-event{% if event.booking.status == 'cancelled' %} is-cancelled{% endif %}"
+        style="top: {{ event.top }}%; height: {{ event.height }}%">
+        <strong>{{ event.booking.start|date:"H:i" }} {{ event.booking.customer_name }}</strong>
+        {{ event.booking.service.name }}{% if not column.staff %} · {{ event.booking.staff.name }}{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div class="card empty">Add staff to see their calendar.</div>
+{% endif %}
