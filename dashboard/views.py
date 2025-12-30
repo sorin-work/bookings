@@ -40,4 +40,6 @@ def calendar_view(request):
         "week_start": calendar.week_start(day),
         "week_end": calendar.week_start(day) + timedelta(days=6),
     }
+    if request.headers.get("HX-Request"):
+        return render(request, "dashboard/includes/calendar.html", context)
     return render(request, "dashboard/calendar.html", context)

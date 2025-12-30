@@ -2,11 +2,15 @@
   <span class="title">
     {% if view == "week" %}{{ week_start|date:"j M" }} – {{ week_end|date:"j M Y" }}{% else %}{{ day|date:"l j F Y" }}{% endif %}
   </span>
-  <a class="button" href="?view={{ view }}&amp;date={{ previous_day|date:'Y-m-d' }}">←</a>
-  <a class="button" href="?view={{ view }}&amp;date={{ today|date:'Y-m-d' }}">Today</a>
-  <a class="button" href="?view={{ view }}&amp;date={{ next_day|date:'Y-m-d' }}">→</a>
-  <a class="button{% if view == 'day' %} button-primary{% endif %}" href="?view=day&amp;date={{ day|date:'Y-m-d' }}">Day</a>
-  <a class="button{% if view == 'week' %} button-primary{% endif %}" href="?view=week&amp;date={{ day|date:'Y-m-d' }}">Week</a>
+  {% with base="?view="|add:view %}
+  {% with staff_q=selected_staff.pk|default_if_none:"" %}
+  <a class="button" href="{{ base }}&amp;date={{ previous_day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-get="{{ base }}&amp;date={{ previous_day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-target="#calendar" hx-push-url="true">←</a>
+  <a class="button" href="{{ base }}&amp;date={{ today|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-get="{{ base }}&amp;date={{ today|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-target="#calendar" hx-push-url="true">Today</a>
+  <a class="button" href="{{ base }}&amp;date={{ next_day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-get="{{ base }}&amp;date={{ next_day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-target="#calendar" hx-push-url="true">→</a>
+  <a class="button{% if view == 'day' %} button-primary{% endif %}" href="?view=day&amp;date={{ day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-get="?view=day&amp;date={{ day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-target="#calendar" hx-push-url="true">Day</a>
+  <a class="button{% if view == 'week' %} button-primary{% endif %}" href="?view=week&amp;date={{ day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-get="?view=week&amp;date={{ day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-target="#calendar" hx-push-url="true">Week</a>
+  {% endwith %}
+  {% endwith %}
 </div>
 {% if grid.columns %}
 <div class="calendar" style="--columns: {{ grid.columns|length }}; --hours: {{ grid.hour_count }}; --hour-height: 56px">
