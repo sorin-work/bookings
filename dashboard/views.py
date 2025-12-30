@@ -23,7 +23,10 @@ def calendar_view(request):
     day = _parse_day(request.GET.get("date"), business.today())
     view = request.GET.get("view") if request.GET.get("view") in ("day", "week") else "day"
     staff = business.staff.prefetch_related("working_hours")
-    shown = list(staff)
+    selected_staff = None
+    if request.GET.get("staff", "").isdigit():
+        selected_staff = staff.filter(pk=int(request.GET["staff"])).first()
+    shown = [selected_staff] if selected_staff else list(staff)
     if view == "week":
         grid = calendar.week_grid(business, day, shown)
         step = timedelta(days=7)
@@ -37,6 +40,8 @@ def calendar_view(request):
         "today": business.today(),
         "previous_day": day - step,
         "next_day": day + step,
+        "staff": staff,
+        "selected_staff": selected_staff,
         "week_start": calendar.week_start(day),
         "week_end": calendar.week_start(day) + timedelta(days=6),
     }

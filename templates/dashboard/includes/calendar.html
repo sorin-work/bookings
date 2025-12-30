@@ -11,6 +11,14 @@
   <a class="button{% if view == 'week' %} button-primary{% endif %}" href="?view=week&amp;date={{ day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-get="?view=week&amp;date={{ day|date:'Y-m-d' }}{% if staff_q %}&amp;staff={{ staff_q }}{% endif %}" hx-target="#calendar" hx-push-url="true">Week</a>
   {% endwith %}
   {% endwith %}
+  <form method="get" hx-get="{% url 'dashboard:calendar' %}" hx-target="#calendar" hx-trigger="change" hx-push-url="true">
+    <input type="hidden" name="date" value="{{ day|date:'Y-m-d' }}">
+    <input type="hidden" name="view" value="{{ view }}">
+    <select name="staff" aria-label="Staff" style="width: auto" onchange="if (!window.htmx) this.form.submit()">
+      <option value="">Everyone</option>
+      {% for member in staff %}<option value="{{ member.pk }}" {% if selected_staff and member.pk == selected_staff.pk %}selected{% endif %}>{{ member.name }}</option>{% endfor %}
+    </select>
+  </form>
 </div>
 {% if grid.columns %}
 <div class="calendar" style="--columns: {{ grid.columns|length }}; --hours: {{ grid.hour_count }}; --hour-height: 56px">
