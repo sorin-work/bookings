@@ -1,0 +1,5 @@
+{% load ui %}
+<div class="panel" id="booking-panel">
+  <button type="button" class="panel-close link-button" onclick="document.getElementById('panel').innerHTML = ''" aria-label="Close">✕</button>
+  {% include "dashboard/includes/booking_body.html" %}
+</div>

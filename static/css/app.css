@@ -181,3 +181,6 @@ input[type="checkbox"] { width: auto; }
 }
 .calendar-event.is-cancelled { opacity: 0.5; text-decoration: line-through; }
 .calendar-event strong { display: block; }
+
+.panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100%); background: var(--surface); border-left: 1px solid var(--border); box-shadow: -8px 0 24px rgb(15 23 42 / 12%); padding: 1.5rem; overflow-y: auto; z-index: 10; }
+.panel-close { float: right; }

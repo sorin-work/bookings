@@ -31,11 +31,13 @@
     {% for column in grid.columns %}
     <div class="calendar-column">
       {% for event in column.events %}
-      <div class="calendar-event{% if event.booking.status == 'cancelled' %} is-cancelled{% endif %}"
+      <a class="calendar-event{% if event.booking.status == 'cancelled' %} is-cancelled{% endif %}"
+        href="{% url 'dashboard:booking' event.booking.pk %}"
+        hx-get="{% url 'dashboard:booking' event.booking.pk %}" hx-target="#panel"
         style="top: {{ event.top }}%; height: {{ event.height }}%">
         <strong>{{ event.booking.start|date:"H:i" }} {{ event.booking.customer_name }}</strong>
         {{ event.booking.service.name }}{% if not column.staff %} · {{ event.booking.staff.name }}{% endif %}
-      </div>
+      </a>
       {% endfor %}
     </div>
     {% endfor %}

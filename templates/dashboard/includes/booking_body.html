@@ -1,0 +1,16 @@
+{% load ui %}
+{% include "includes/messages.html" %}
+<h2>{{ booking.customer_name }}</h2>
+<p class="status-{{ booking.status }}">{{ booking.get_status_display }}{% if booking.cancelled_by %} by {{ booking.get_cancelled_by_display|lower }}{% endif %}</p>
+<div class="booking-summary">
+  <dl>
+    <dt>When</dt><dd>{{ booking.start|date:"D j M Y" }}, {{ booking.start|date:"H:i" }}–{{ booking.end|date:"H:i" }}</dd>
+    <dt>Service</dt><dd>{{ booking.service.name }} ({{ booking.duration_minutes|duration }})</dd>
+    <dt>With</dt><dd>{{ booking.staff.name }}</dd>
+    <dt>Price</dt><dd>{{ booking.price|money }}</dd>
+    <dt>Email</dt><dd><a href="mailto:{{ booking.customer_email }}">{{ booking.customer_email }}</a></dd>
+    <dt>Phone</dt><dd><a href="tel:{{ booking.customer_phone }}">{{ booking.customer_phone }}</a></dd>
+    <dt>Reference</dt><dd>{{ booking.reference }}</dd>
+    <dt>Booked</dt><dd>{{ booking.created_at|date:"j M Y, H:i" }}</dd>
+  </dl>
+</div>

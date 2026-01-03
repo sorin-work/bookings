@@ -2,7 +2,9 @@
 {% block title %}Calendar · {{ business.name }}{% endblock %}
 {% block content %}
 <div id="calendar"
+  hx-get="{{ request.get_full_path }}" hx-trigger="bookingChanged from:body" hx-swap="innerHTML"
 >
   {% include "dashboard/includes/calendar.html" %}
 </div>
+<div id="panel"></div>
 {% endblock %}

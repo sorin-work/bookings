@@ -1,0 +1,8 @@
+{% extends "app.html" %}
+{% block title %}{{ booking.customer_name }} · Booking {{ booking.reference }}{% endblock %}
+{% block content %}
+<p><a href="{% url 'dashboard:calendar' %}?date={{ booking.start|date:'Y-m-d' }}">← Calendar</a></p>
+<div class="card form" id="panel">
+  {% include "dashboard/includes/booking_body.html" %}
+</div>
+{% endblock %}

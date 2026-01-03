@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from businesses.decorators import business_required
 
@@ -48,3 +48,16 @@ def calendar_view(request):
     if request.headers.get("HX-Request"):
         return render(request, "dashboard/includes/calendar.html", context)
     return render(request, "dashboard/calendar.html", context)
+
+
+def _booking(request, pk):
+    return get_object_or_404(request.business.bookings.select_related("service", "staff"), pk=pk)
+
+
+@business_required
+def booking_detail(request, pk):
+    booking = _booking(request, pk)
+    context = {"booking": booking}
+    if request.headers.get("HX-Request"):
+        return render(request, "dashboard/includes/booking_panel.html", context)
+    return render(request, "dashboard/booking_detail.html", context)
