@@ -24,11 +24,15 @@ class Booking(models.Model):
     class Status(models.TextChoices):
         CONFIRMED = "confirmed", "Confirmed"
         CANCELLED = "cancelled", "Cancelled"
+        COMPLETED = "completed", "Completed"
+        NO_SHOW = "no_show", "No-show"
 
     class CancelledBy(models.TextChoices):
         CUSTOMER = "customer", "Customer"
         BUSINESS = "business", "Business"
 
+    # Statuses that count as a real appointment, in the past or the future.
+    ACTIVE_STATUSES = [Status.CONFIRMED, Status.COMPLETED, Status.NO_SHOW]
     CLOSED_STATUSES = [Status.CANCELLED]
 
     public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)

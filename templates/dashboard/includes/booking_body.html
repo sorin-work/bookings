@@ -14,3 +14,9 @@
     <dt>Booked</dt><dd>{{ booking.created_at|date:"j M Y, H:i" }}</dd>
   </dl>
 </div>
+<div class="actions">
+  {% if can_mark %}
+  <button class="button-small" hx-post="{% url 'dashboard:booking_outcome' booking.pk %}" hx-vals='{"status": "completed"}' hx-target="#panel">Completed</button>
+  <button class="button-small" hx-post="{% url 'dashboard:booking_outcome' booking.pk %}" hx-vals='{"status": "no_show"}' hx-target="#panel">No-show</button>
+  {% endif %}
+</div>

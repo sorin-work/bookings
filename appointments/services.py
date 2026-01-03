@@ -114,3 +114,17 @@ def reschedule_booking(booking, start, *, now=None):
         booking.save(update_fields=["start", "end", "updated_at"])
         _after_commit(emails.booking_rescheduled, booking, old_start)
     return booking
+
+
+def set_outcome(booking, status, *, now=None):
+    """Mark a booking that has started as completed or a no-show."""
+    now = now or timezone.now()
+    if status not in (Booking.Status.COMPLETED, Booking.Status.NO_SHOW):
+        raise ValueError(f"Not an outcome: {status}")
+    if booking.start > now:
+        raise ValueError("The appointment hasn't started yet.")
+    if booking.status in Booking.CLOSED_STATUSES:
+        raise ValueError("Cancelled bookings can't be marked.")
+    booking.status = status
+    booking.save(update_fields=["status", "updated_at"])
+    return booking

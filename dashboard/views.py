@@ -1,7 +1,11 @@
 from datetime import date, timedelta
 
-from django.shortcuts import get_object_or_404, render
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
+from appointments import services
 from businesses.decorators import business_required
 
 from . import calendar
@@ -57,7 +61,29 @@ def _booking(request, pk):
 @business_required
 def booking_detail(request, pk):
     booking = _booking(request, pk)
-    context = {"booking": booking}
+    context = {"booking": booking, "can_mark": booking.start <= timezone.now() and booking.is_open}
     if request.headers.get("HX-Request"):
         return render(request, "dashboard/includes/booking_panel.html", context)
     return render(request, "dashboard/booking_detail.html", context)
+
+
+def _after_action(request, booking):
+    """htmx: re-render the panel and tell the calendar to refresh; otherwise redirect."""
+    if request.headers.get("HX-Request"):
+        response = booking_detail(request, booking.pk)
+        response["HX-Trigger"] = "bookingChanged"
+        return response
+    return redirect("dashboard:booking", pk=booking.pk)
+
+
+@business_required
+@require_POST
+def booking_outcome(request, pk):
+    booking = _booking(request, pk)
+    try:
+        services.set_outcome(booking, request.POST.get("status"))
+    except ValueError as exc:
+        messages.error(request, str(exc))
+    else:
+        messages.success(request, f"Marked as {booking.get_status_display().lower()}.")
+    return _after_action(request, booking)

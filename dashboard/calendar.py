@@ -99,6 +99,7 @@ def _bookings(business, staff, first_day, last_day):
     end = datetime.combine(last_day + timedelta(days=1), time(0), tzinfo=tz)
     return list(
         Booking.objects.filter(business=business, staff__in=staff, start__lt=end, end__gt=start)
+        .exclude(status__in=Booking.CLOSED_STATUSES)
         .select_related("service", "staff")
         .order_by("start")
     )
