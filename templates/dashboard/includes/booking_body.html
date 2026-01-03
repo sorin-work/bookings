@@ -19,4 +19,7 @@
   <button class="button-small" hx-post="{% url 'dashboard:booking_outcome' booking.pk %}" hx-vals='{"status": "completed"}' hx-target="#panel">Completed</button>
   <button class="button-small" hx-post="{% url 'dashboard:booking_outcome' booking.pk %}" hx-vals='{"status": "no_show"}' hx-target="#panel">No-show</button>
   {% endif %}
+  {% if booking.is_open %}
+  <button class="button-small button-danger" hx-post="{% url 'dashboard:booking_cancel' booking.pk %}" hx-target="#panel" hx-confirm="Cancel this booking? {{ booking.customer_name }} will get an email.">Cancel booking</button>
+  {% endif %}
 </div>

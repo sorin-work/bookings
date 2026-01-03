@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from appointments import services
+from appointments.models import Booking
 from businesses.decorators import business_required
 
 from . import calendar
@@ -86,4 +87,14 @@ def booking_outcome(request, pk):
         messages.error(request, str(exc))
     else:
         messages.success(request, f"Marked as {booking.get_status_display().lower()}.")
+    return _after_action(request, booking)
+
+
+@business_required
+@require_POST
+def booking_cancel(request, pk):
+    booking = _booking(request, pk)
+    if booking.is_open:
+        services.cancel_booking(booking, Booking.CancelledBy.BUSINESS)
+        messages.success(request, "Booking cancelled. The customer has been emailed.")
     return _after_action(request, booking)
