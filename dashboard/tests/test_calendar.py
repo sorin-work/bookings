@@ -131,3 +131,8 @@ def test_other_businesses_bookings_are_hidden(client, service, staff):
     client.force_login(other)
 
     assert client.get(reverse("dashboard:booking", args=[booking.pk])).status_code == 404
+
+
+@pytest.mark.parametrize("day", [date(2026, 1, 5), date(2026, 1, 8), date(2026, 1, 11)])
+def test_week_starts_on_monday_for_every_day_of_the_week(day):
+    assert calendar.week_start(day) == date(2026, 1, 5)

@@ -44,7 +44,8 @@ class Grid:
 
 
 def week_start(day):
-    return day - timedelta(days=day.isoweekday() % 7 - 1)
+    """The Monday of `day`'s week."""
+    return day - timedelta(days=day.weekday())
 
 
 def _visible_hours(staff, days, bookings, tz):
