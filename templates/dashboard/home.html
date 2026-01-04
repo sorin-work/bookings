@@ -5,6 +5,12 @@
 <div class="page-header">
   <h1>{{ business.name }}</h1>
 </div>
+<div class="stats">
+  <div class="card stat"><div class="value">{{ summary.today.count }}</div><div class="label">Bookings today</div></div>
+  <div class="card stat"><div class="value">{{ summary.week.count }}</div><div class="label">This week</div></div>
+  <div class="card stat"><div class="value">{{ summary.week.revenue|money }}</div><div class="label">Revenue this week</div></div>
+  <div class="card stat"><div class="value">{{ summary.month.revenue|money }}</div><div class="label">Revenue this month</div></div>
+</div>
 <div class="dashboard-grid">
   <div class="card">
     <h2>Today</h2>

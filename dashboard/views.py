@@ -9,7 +9,7 @@ from appointments import services
 from appointments.models import Booking
 from businesses.decorators import business_required
 
-from . import calendar
+from . import calendar, stats
 
 
 @business_required
@@ -20,6 +20,7 @@ def home(request):
     context = {
         "today_bookings": [b for b in upcoming[:50] if b.local_start.date() == today],
         "next_bookings": [b for b in upcoming[:50] if b.local_start.date() > today][:8],
+        "summary": stats.summary(business),
     }
     return render(request, "dashboard/home.html", context)
 
