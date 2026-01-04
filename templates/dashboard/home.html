@@ -20,7 +20,7 @@
       <li>
         <span class="time">{{ booking.start|date:"H:i" }}</span>
         <span>
-          {{ booking.customer_name }}
+          <a href="{% url 'dashboard:booking' booking.pk %}">{{ booking.customer_name }}</a>
           <span class="muted">· {{ booking.service.name }} with {{ booking.staff.name }}</span>
           {% if booking.status == "pending" %}<span class="badge status-pending">unconfirmed</span>{% endif %}
         </span>
