@@ -3,6 +3,7 @@ import uuid
 from datetime import timedelta
 
 from django.db import models
+from django.utils import timezone
 
 from businesses.models import Business, Service, StaffMember
 
@@ -18,6 +19,10 @@ class BookingQuerySet(models.QuerySet):
     def blocking(self):
         """Bookings that take up the staff member's time."""
         return self.exclude(status=Booking.Status.CANCELLED)
+
+    def upcoming(self, now=None):
+        now = now or timezone.now()
+        return self.filter(end__gt=now).exclude(status__in=Booking.CLOSED_STATUSES)
 
 
 class Booking(models.Model):

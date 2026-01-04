@@ -15,7 +15,13 @@ from . import calendar
 @business_required
 def home(request):
     business = request.business
-    return render(request, "dashboard/home.html", {"business": business})
+    today = business.today()
+    upcoming = business.bookings.upcoming().select_related("service", "staff").order_by("start")
+    context = {
+        "today_bookings": [b for b in upcoming[:50] if b.local_start.date() == today],
+        "next_bookings": [b for b in upcoming[:50] if b.local_start.date() > today][:8],
+    }
+    return render(request, "dashboard/home.html", context)
 
 
 def _parse_day(value, default):
