@@ -26,7 +26,10 @@ def home(request):
 
 
 def _parse_day(value, default):
-    return date.fromisoformat(value) if value else default
+    try:
+        return date.fromisoformat(value)
+    except (TypeError, ValueError):
+        return default
 
 
 @business_required

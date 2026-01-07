@@ -133,6 +133,13 @@ def test_other_businesses_bookings_are_hidden(client, service, staff):
     assert client.get(reverse("dashboard:booking", args=[booking.pk])).status_code == 404
 
 
+def test_mistyped_date_shows_today(owner_client, business, staff):
+    response = owner_client.get(reverse("dashboard:calendar"), {"date": "2026-13-45"})
+
+    assert response.status_code == 200
+    assert response.context["day"] == business.today()
+
+
 @pytest.mark.parametrize("day", [date(2026, 1, 5), date(2026, 1, 8), date(2026, 1, 11)])
 def test_week_starts_on_monday_for_every_day_of_the_week(day):
     assert calendar.week_start(day) == date(2026, 1, 5)
