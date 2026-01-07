@@ -98,6 +98,8 @@ def slots(request, slug, service_id):
     service = _service(business, service_id)
     staff = _staff(request, business, service)
     day = _parse_day(request.GET.get("date"))
+    if day is None:
+        raise Http404("Pick a day.")
     context = {
         "business": business,
         "service": service,
@@ -212,6 +214,8 @@ def manage_reschedule(request, token):
 def manage_reschedule_slots(request, token):
     booking = _booking(token)
     day = _parse_day(request.GET.get("date"))
+    if day is None:
+        raise Http404("Pick a day.")
     context = {
         "booking": booking,
         "business": booking.business,

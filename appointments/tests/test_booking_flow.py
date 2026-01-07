@@ -117,3 +117,10 @@ def test_start_must_be_a_time(client, business, service, staff):
     url = reverse("appointments:book", args=[business.slug, service.pk]) + "?start=tomorrow"
 
     assert client.get(url).status_code == 404
+
+
+@pytest.mark.parametrize("value", ["", "31-12-2030", "soon"])
+def test_slots_without_a_proper_day_are_a_404(client, business, service, staff, value):
+    url = reverse("appointments:slots", args=[business.slug, service.pk])
+
+    assert client.get(url, {"date": value}).status_code == 404
