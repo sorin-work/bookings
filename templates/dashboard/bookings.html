@@ -1,0 +1,49 @@
+{% extends "app.html" %}
+{% load ui %}
+{% block title %}Bookings · {{ business.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Bookings</h1>
+  <div class="actions" style="margin: 0">
+  </div>
+</div>
+<form method="get" class="filters">
+  <div class="field">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="">Any</option>
+      {% for value, label in statuses %}<option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="staff">Staff</label>
+    <select id="staff" name="staff">
+      <option value="">Everyone</option>
+      {% for member in staff %}<option value="{{ member.pk }}" {% if filters.staff == member.pk|stringformat:"d" %}selected{% endif %}>{{ member.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field"><label for="from">From</label><input id="from" type="date" name="from" value="{{ filters.from|date:'Y-m-d' }}"></div>
+  <div class="field"><label for="to">To</label><input id="to" type="date" name="to" value="{{ filters.to|date:'Y-m-d' }}"></div>
+  <button type="submit" class="button">Filter</button>
+  <a href="{% url 'dashboard:bookings' %}">Reset</a>
+</form>
+{% if bookings %}
+<table class="table">
+  <thead><tr><th>When</th><th>Customer</th><th>Service</th><th>Staff</th><th>Status</th><th class="num">Price</th></tr></thead>
+  <tbody>
+    {% for booking in bookings %}
+    <tr>
+      <td><a href="{% url 'dashboard:booking' booking.pk %}">{{ booking.start|date:"D j M Y, H:i" }}</a></td>
+      <td>{{ booking.customer_name }}<div class="muted small">{{ booking.customer_email }} · {{ booking.reference }}</div></td>
+      <td>{{ booking.service.name }}</td>
+      <td>{{ booking.staff.name }}</td>
+      <td class="status-{{ booking.status }}">{{ booking.get_status_display }}</td>
+      <td class="num">{{ booking.price|money }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card empty">No bookings match.</div>
+{% endif %}
+{% endblock %}

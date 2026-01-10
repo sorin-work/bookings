@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import lists, views
 
 app_name = "dashboard"
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path("bookings/<int:pk>/", views.booking_detail, name="booking"),
     path("bookings/<int:pk>/outcome/", views.booking_outcome, name="booking_outcome"),
     path("bookings/<int:pk>/cancel/", views.booking_cancel, name="booking_cancel"),
+    path("bookings/", lists.bookings, name="bookings"),
 ]

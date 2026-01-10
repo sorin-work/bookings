@@ -194,3 +194,8 @@ input[type="checkbox"] { width: auto; }
 .agenda li { display: flex; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
 .agenda li:last-child { border-bottom: 0; }
 .agenda .time { font-variant-numeric: tabular-nums; min-width: 3.2rem; font-weight: 600; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: end; margin-bottom: 1rem; }
+.filters .field { margin: 0; }
+.filters input, .filters select { width: auto; }
+.pagination { display: flex; gap: 0.75rem; align-items: center; justify-content: center; margin-top: 1rem; }
