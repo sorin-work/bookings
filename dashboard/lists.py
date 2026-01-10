@@ -2,6 +2,7 @@
 
 from datetime import date, datetime, time, timedelta
 
+from django.db.models import Q
 from django.shortcuts import render
 
 from appointments.models import Booking
@@ -25,6 +26,7 @@ def filtered_bookings(request):
         "from": _parse_day(request.GET.get("from")),
         "to": _parse_day(request.GET.get("to")),
         "staff": request.GET.get("staff", ""),
+        "q": request.GET.get("q", "").strip(),
     }
     if filters["status"] in Booking.Status.values:
         qs = qs.filter(status=filters["status"])
@@ -35,6 +37,14 @@ def filtered_bookings(request):
         qs = qs.filter(start__lt=end)
     if filters["staff"].isdigit():
         qs = qs.filter(staff_id=int(filters["staff"]))
+    if filters["q"]:
+        q = filters["q"]
+        qs = qs.filter(
+            Q(customer_name__icontains=q)
+            | Q(customer_email__icontains=q)
+            | Q(customer_phone__icontains=q)
+            | Q(reference__iexact=q)
+        )
     if not filters["from"] and not filters["to"]:
         # Newest first when browsing everything.
         qs = qs.order_by("-start")
