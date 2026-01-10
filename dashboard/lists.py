@@ -2,6 +2,7 @@
 
 from datetime import date, datetime, time, timedelta
 
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render
 
@@ -54,7 +55,15 @@ def filtered_bookings(request):
 @business_required
 def bookings(request):
     qs, filters = filtered_bookings(request)
-    context = {"bookings": qs[:200], "filters": filters}
+    page = Paginator(qs, 25).get_page(request.GET.get("page"))
+    query = request.GET.copy()
+    query.pop("page", None)
+    context = {
+        "page": page,
+        "bookings": page.object_list,
+        "filters": filters,
+        "query": query.urlencode(),
+    }
     context["statuses"] = Booking.Status.choices
     context["staff"] = request.business.staff.all()
     return render(request, "dashboard/bookings.html", context)

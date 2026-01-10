@@ -44,6 +44,13 @@
     {% endfor %}
   </tbody>
 </table>
+{% if page.paginator.num_pages > 1 %}
+<nav class="pagination">
+  {% if page.has_previous %}<a href="?{{ query }}&amp;page={{ page.previous_page_number }}">← Newer</a>{% endif %}
+  <span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }} · {{ page.paginator.count }} bookings</span>
+  {% if page.has_next %}<a href="?{{ query }}&amp;page={{ page.next_page_number }}">Older →</a>{% endif %}
+</nav>
+{% endif %}
 {% else %}
 <div class="card empty">No bookings match.</div>
 {% endif %}
