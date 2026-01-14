@@ -2,7 +2,7 @@
 
 from datetime import datetime, time, timedelta
 
-from django.db.models import Count, Sum
+from django.db.models import Count, Q, Sum
 
 from appointments.models import Booking
 
@@ -19,7 +19,13 @@ def period_totals(business, first_day, last_day):
         start__gte=_start_of(first_day, tz),
         start__lt=_start_of(last_day + timedelta(days=1), tz),
     )
-    totals = qs.aggregate(count=Count("pk"), revenue=Sum("price"))
+    # Cancelled bookings and no-shows don't bring in money.
+    totals = qs.aggregate(
+        count=Count("pk", filter=~Q(status__in=Booking.CLOSED_STATUSES)),
+        revenue=Sum(
+            "price", filter=Q(status__in=[Booking.Status.CONFIRMED, Booking.Status.COMPLETED])
+        ),
+    )
     return {"count": totals["count"] or 0, "revenue": totals["revenue"] or 0}
 
 
