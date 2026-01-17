@@ -1,6 +1,7 @@
 """Settings for the bookings project.
 
 Everything that changes between environments is read from environment variables.
+See .env.example and the configuration table in the README.
 """
 
 import os
