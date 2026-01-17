@@ -28,3 +28,5 @@ known-first-party = [
 DJANGO_SETTINGS_MODULE = "config.settings"
 python_files = ["test_*.py"]
 addopts = "-q --strict-markers"
+# whitenoise looks for STATIC_ROOT, which only exists after collectstatic.
+filterwarnings = ["ignore:No directory at:UserWarning"]

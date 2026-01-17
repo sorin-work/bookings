@@ -9,6 +9,15 @@ from businesses.models import Business, Service, StaffMember, WorkingHours
 PASSWORD = "correct-horse-battery-staple"
 
 
+@pytest.fixture(autouse=True)
+def _plain_static_files(settings):
+    """The manifest storage needs collectstatic; tests don't run it."""
+    settings.STORAGES = {
+        **settings.STORAGES,
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
+
+
 @pytest.fixture
 def user(db):
     return User.objects.create_user(email="owner@example.com", password=PASSWORD)
