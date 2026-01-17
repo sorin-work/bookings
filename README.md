@@ -87,3 +87,4 @@ ruff check .
 ```
 
 pytest-django creates and drops a `test_bookings` database next to the real one.
+CI (`.github/workflows/ci.yml`) runs the linter and the tests against Postgres.
