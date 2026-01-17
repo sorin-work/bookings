@@ -50,11 +50,16 @@ database.
 | Service | Host port | URL                                                    | Notes                       |
 | ------- | --------- | ------------------------------------------------------ | --------------------------- |
 | app     | 4406      | http://localhost:4406                                  | gunicorn, health at /healthz |
+| mailpit | 8026      | http://localhost:8026                                  | every email the app sends   |
 | db      | 5446      | `postgresql://bookings:bookings@localhost:5446/bookings` | Postgres 17               |
 
 Ports can be changed with `APP_PORT`, `MAILPIT_UI_PORT` and `DB_PORT` (in `.env` or
 inline, e.g. `APP_PORT=8080 docker compose up`). Data lives in the `db-data` volume;
 `docker compose down -v` removes it.
+
+Every email the app sends (confirmations, cancellations, password resets) ends up in
+mailpit instead of a real inbox: open http://localhost:8026 to read them and click the
+booking links. Mailpit's SMTP port is only reachable from the app container.
 
 ## Running without Docker
 
