@@ -87,6 +87,17 @@ input[type="checkbox"] { width: auto; }
 .field { margin-bottom: 1rem; }
 .errorlist { color: var(--danger); list-style: none; padding: 0; margin: 0.25rem 0 0; font-size: 0.9rem; }
 .helptext { color: var(--muted); font-size: 0.85rem; }
+.form { max-width: 560px; }
+.form-wide { max-width: none; }
+.form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0 1rem; }
+.field-error input, .field-error select, .field-error textarea { border-color: var(--danger); }
+.field-checkbox label { display: flex; gap: 0.5rem; align-items: center; font-weight: 400; }
+.form-errors { background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius); padding: 0.6rem 0.9rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 1rem; }
+input:focus, select:focus, textarea:focus, button:focus-visible, .button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
 
 /* Signed-in layout */
 .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
