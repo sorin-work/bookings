@@ -90,6 +90,9 @@ class Command(BaseCommand):
         parser.add_argument("--seed", type=int, default=2025, help="Random seed for the data.")
 
     def handle(self, *args, **options):
+        if User.objects.filter(email=DEMO_EMAIL).exists():
+            self.stdout.write("Demo account already exists, nothing to do.")
+            return
         rng = random.Random(options["seed"])
         self.references = set()
         with transaction.atomic():
