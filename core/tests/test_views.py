@@ -16,3 +16,15 @@ def test_signed_in_users_go_to_the_dashboard(owner_client):
 
     assert response.status_code == 302
     assert response["Location"] == reverse("dashboard:home")
+
+
+def test_admin_pages_load(admin_client, service, staff):
+    for name in [
+        "accounts_user",
+        "businesses_business",
+        "businesses_staffmember",
+        "businesses_timeoff",
+        "appointments_booking",
+    ]:
+        response = admin_client.get(reverse(f"admin:{name}_changelist"))
+        assert response.status_code == 200, name
