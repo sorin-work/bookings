@@ -11,6 +11,7 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils import timezone
 
+from appointments.ics import booking_ics
 from appointments.tokens import absolute_url
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ def _subject(template, booking):
     return subject
 
 
-def _send(name, booking, to, subject, *, reply_to=None, **extra):
+def _send(name, booking, to, subject, *, reply_to=None, attach_ics=False, **extra):
     context = _context(booking, **extra)
     with timezone.override(booking.business.tz):
         body = render_to_string(f"emails/{name}.txt", context)
@@ -58,6 +59,8 @@ def _send(name, booking, to, subject, *, reply_to=None, **extra):
         to=to,
         reply_to=reply_to,
     )
+    if attach_ics:
+        message.attach(f"booking-{booking.reference}.ics", booking_ics(booking), "text/calendar")
     try:
         message.send()
     except Exception:
@@ -65,13 +68,14 @@ def _send(name, booking, to, subject, *, reply_to=None, **extra):
         logger.exception("Could not send %s email for booking %s", name, booking.reference)
 
 
-def _customer(kind, booking, **extra):
+def _customer(kind, booking, *, attach_ics=False, **extra):
     _send(
         f"customer_{kind}",
         booking,
         [booking.customer_email],
         CUSTOMER_SUBJECTS[kind],
         reply_to=[booking.business.notification_email],
+        attach_ics=attach_ics,
         **extra,
     )
 
@@ -93,7 +97,7 @@ def _business(kind, booking, **extra):
 
 
 def booking_created(booking):
-    _customer("created", booking)
+    _customer("created", booking, attach_ics=True)
     _business("created", booking)
 
 
@@ -104,5 +108,5 @@ def booking_cancelled(booking):
 
 
 def booking_rescheduled(booking, old_start):
-    _customer("rescheduled", booking, old_start=old_start)
+    _customer("rescheduled", booking, attach_ics=True, old_start=old_start)
     _business("rescheduled", booking, old_start=old_start)
