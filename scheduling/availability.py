@@ -19,7 +19,7 @@ def bookable_staff(service):
 def booking_window(business, now=None):
     """(first day, last day, earliest start) customers can book, in the business's time zone."""
     now = now or timezone.now()
-    today = now.date()
+    today = now.astimezone(business.tz).date()
     last_day = today + timedelta(days=business.max_advance_days)
     earliest = now + timedelta(minutes=business.min_notice_minutes)
     return today, last_day, earliest

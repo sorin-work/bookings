@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import UTC, date, datetime, time, timedelta
 
 import pytest
 
@@ -84,3 +84,15 @@ def test_cancelled_bookings_do_not_block(service, staff):
     make_booking(service, staff, at(monday, 10), status=Booking.Status.CANCELLED)
 
     assert availability.is_available(service, staff, at(monday, 10))
+
+
+def test_booking_window_starts_on_the_business_s_local_date(business):
+    business.timezone = "Pacific/Auckland"
+    business.min_notice_minutes = 0
+    now = datetime(2026, 1, 12, 20, 0, tzinfo=UTC)  # already Tuesday morning in Auckland
+
+    first_day, last_day, earliest = availability.booking_window(business, now)
+
+    assert first_day == date(2026, 1, 13)
+    assert last_day == date(2026, 1, 13) + timedelta(days=business.max_advance_days)
+    assert earliest == now
