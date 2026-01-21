@@ -98,3 +98,15 @@ def test_a_failing_mail_server_does_not_lose_the_booking(send, service, staff, c
 
     assert Booking.objects.filter(pk=booking.pk).exists()
     assert "Could not send customer_created email" in caplog.text
+
+
+def test_confirmation_has_a_calendar_file(send, service, staff):
+    booking, sent = send(
+        services.create_booking, service, at(next_weekday(0), 10), customer(), staff
+    )
+
+    to_customer = next(m for m in sent if m.to == ["ana@example.com"])
+    name, content, mimetype = to_customer.attachments[0]
+    assert name == f"booking-{booking.reference}.ics"
+    assert mimetype == "text/calendar"
+    assert "BEGIN:VEVENT" in content
