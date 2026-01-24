@@ -224,3 +224,19 @@ def manage_reschedule_slots(request, token):
         **_times(booking.service, booking.staff, day),
     }
     return render(request, "appointments/includes/slots.html", context)
+
+
+@require_POST
+def manage_confirm(request, token):
+    booking = _booking(token)
+    try:
+        services.confirm_booking(booking)
+    except services.SlotUnavailable:
+        messages.error(
+            request,
+            "Sorry, the confirmation link ran out and someone else has booked that time since. "
+            "Please pick a new time.",
+        )
+        return redirect(booking.manage_url)
+    messages.success(request, "Thanks, your booking is confirmed.")
+    return redirect(booking.manage_url)

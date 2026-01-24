@@ -1,0 +1,13 @@
+{% autoescape off %}Hi {{ booking.customer_name }},
+
+Thanks for booking with {{ business.name }}. Please confirm your booking with this link{% if booking.hold_expires_at %} by {{ booking.hold_expires_at|date:"H:i" }}{% endif %}:
+{{ manage_url }}
+
+Until it's confirmed we only hold the time for a short while.
+
+{% include "emails/_details.txt" %}
+
+If you didn't make this booking, you can ignore this email.
+
+{{ business.name }}
+{% endautoescape %}

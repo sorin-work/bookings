@@ -54,6 +54,10 @@ class Business(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(365)],
         help_text="How many days ahead customers can book.",
     )
+    require_confirmation = models.BooleanField(
+        default=False,
+        help_text="Customers confirm their booking from a link in the email before it counts.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

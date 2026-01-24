@@ -17,4 +17,5 @@ urlpatterns = [
         views.manage_reschedule_slots,
         name="manage_reschedule_slots",
     ),
+    path("m/<str:token>/confirm/", views.manage_confirm, name="manage_confirm"),
 ]

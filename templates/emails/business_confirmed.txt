@@ -1,0 +1,4 @@
+{% autoescape off %}{{ booking.customer_name }} confirmed their booking:
+
+{% include "emails/_business_details.txt" %}
+{% endautoescape %}

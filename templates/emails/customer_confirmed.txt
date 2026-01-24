@@ -1,0 +1,12 @@
+{% autoescape off %}Hi {{ booking.customer_name }},
+
+Thanks for confirming. You're booked in at {{ business.name }}.
+
+{% include "emails/_details.txt" %}
+
+To change or cancel your booking, use this link:
+{{ manage_url }}
+
+See you soon!
+{{ business.name }}
+{% endautoescape %}

@@ -25,6 +25,7 @@ class BusinessForm(forms.ModelForm):
             "slot_interval_minutes",
             "min_notice_minutes",
             "max_advance_days",
+            "require_confirmation",
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),

@@ -20,12 +20,16 @@ CUSTOMER_SUBJECTS = {
     "created": "Booking confirmed: {service} on {when}",
     "cancelled": "Booking cancelled: {service} on {when}",
     "rescheduled": "Booking moved: {service} is now on {when}",
+    "pending": "Please confirm your booking: {service} on {when}",
+    "confirmed": "Booking confirmed: {service} on {when}",
 }
 
 BUSINESS_SUBJECTS = {
     "created": "New booking: {customer}, {service} on {when}",
     "cancelled": "Cancelled: {customer}, {service} on {when}",
     "rescheduled": "Moved: {customer}, {service} now on {when}",
+    "pending": "New booking (waiting for confirmation): {customer}, {service} on {when}",
+    "confirmed": "Confirmed: {customer}, {service} on {when}",
 }
 
 
@@ -97,8 +101,11 @@ def _business(kind, booking, **extra):
 
 
 def booking_created(booking):
-    _customer("created", booking, attach_ics=True)
-    _business("created", booking)
+    if booking.status == booking.Status.PENDING:
+        _customer("pending", booking)
+    else:
+        _customer("created", booking, attach_ics=True)
+    _business("pending" if booking.status == booking.Status.PENDING else "created", booking)
 
 
 def booking_cancelled(booking):
@@ -110,3 +117,8 @@ def booking_cancelled(booking):
 def booking_rescheduled(booking, old_start):
     _customer("rescheduled", booking, attach_ics=True, old_start=old_start)
     _business("rescheduled", booking, old_start=old_start)
+
+
+def booking_confirmed(booking):
+    _customer("confirmed", booking, attach_ics=True)
+    _business("confirmed", booking)

@@ -27,6 +27,7 @@ class BookingQuerySet(models.QuerySet):
 
 class Booking(models.Model):
     class Status(models.TextChoices):
+        PENDING = "pending", "Awaiting confirmation"
         CONFIRMED = "confirmed", "Confirmed"
         CANCELLED = "cancelled", "Cancelled"
         COMPLETED = "completed", "Completed"
@@ -92,7 +93,7 @@ class Booking(models.Model):
     @property
     def is_open(self):
         """Still going ahead: not cancelled, expired, completed or a no-show."""
-        return self.status == self.Status.CONFIRMED
+        return self.status in (self.Status.CONFIRMED, self.Status.PENDING)
 
     @property
     def manage_url(self):

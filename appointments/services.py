@@ -74,6 +74,7 @@ def create_booking(service, start, customer, staff=None, *, now=None):
         if not free:
             raise SlotUnavailable
         staff = free[0]
+    pending = business.require_confirmation
     with transaction.atomic():
         booking = Booking.objects.create(
             business=business,
@@ -87,6 +88,7 @@ def create_booking(service, start, customer, staff=None, *, now=None):
             customer_name=customer.name,
             customer_email=customer.email,
             customer_phone=customer.phone,
+            status=Booking.Status.PENDING if pending else Booking.Status.CONFIRMED,
         )
         _after_commit(emails.booking_created, booking)
     return booking
@@ -127,4 +129,15 @@ def set_outcome(booking, status, *, now=None):
         raise ValueError("Cancelled bookings can't be marked.")
     booking.status = status
     booking.save(update_fields=["status", "updated_at"])
+    return booking
+
+
+def confirm_booking(booking, *, now=None):
+    """Confirm a booking the customer had to confirm by email."""
+    now = now or timezone.now()
+    if booking.status != Booking.Status.PENDING:
+        return booking
+    booking.status = Booking.Status.CONFIRMED
+    booking.save(update_fields=["status", "updated_at"])
+    _after_commit(emails.booking_confirmed, booking)
     return booking

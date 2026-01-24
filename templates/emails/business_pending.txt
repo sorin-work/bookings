@@ -1,0 +1,6 @@
+{% autoescape off %}New booking for {{ business.name }}, waiting for the customer to confirm it by email:
+
+{% include "emails/_business_details.txt" %}
+
+If it isn't confirmed in time, the slot is released again.
+{% endautoescape %}

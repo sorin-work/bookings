@@ -2,8 +2,13 @@
 {% load ui %}
 {% block content %}
 {% if is_new %}
+{% if booking.status == "pending" %}
+<h1>Almost done</h1>
+<p>We've sent an email to <strong>{{ booking.customer_email }}</strong>. Please confirm your booking from the link in it{% if booking.hold_expires_at %} by {{ booking.hold_expires_at|date:"H:i" }}{% endif %}, otherwise the time is released for others.</p>
+{% else %}
 <h1>You're booked in</h1>
 <p>A confirmation is on its way to <strong>{{ booking.customer_email }}</strong>.</p>
+{% endif %}
 {% else %}
 <h1>Your booking</h1>
 {% endif %}
@@ -19,6 +24,11 @@
     {% if business.address %}<dt>Where</dt><dd>{{ business.address }}</dd>{% endif %}
   </dl>
   <div class="actions">
+    {% if booking.status == "pending" %}
+    <form method="post" action="{% url 'appointments:manage_confirm' token %}">
+      {% csrf_token %}<button type="submit" class="button button-primary">Confirm booking</button>
+    </form>
+    {% endif %}
     {% if can_change %}
     <a class="button" href="{% url 'appointments:manage_reschedule' token %}">Change time</a>
     <form method="post" action="{% url 'appointments:manage_cancel' token %}" onsubmit="return confirm('Cancel this booking?')">
