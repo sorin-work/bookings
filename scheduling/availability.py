@@ -33,7 +33,7 @@ def service_spec(service):
     )
 
 
-def load_schedules(business, staff_members, first_day, last_day):
+def load_schedules(business, staff_members, first_day, last_day, *, now=None):
     """A StaffSchedule per staff member with everything that blocks time between the days."""
     tz = business.tz
     # A day's slots can be blocked by bookings whose buffers reach in from either
@@ -48,7 +48,7 @@ def load_schedules(business, staff_members, first_day, last_day):
 
     busy = defaultdict(list)
     for staff_id in staff_ids:
-        for booking in Booking.objects.blocking().filter(
+        for booking in Booking.objects.blocking(now).filter(
             staff_id=staff_id, start__lt=range_end, end__gt=range_start
         ):
             busy[staff_id].append(Interval(booking.busy_start, booking.busy_end))
@@ -74,7 +74,7 @@ def available_slots(service, day, staff=None, now=None):
     now = now or timezone.now()
     first_day, last_day, earliest = booking_window(business, now)
     members = [staff] if staff else list(bookable_staff(service))
-    schedules = load_schedules(business, members, day, day)
+    schedules = load_schedules(business, members, day, day, now=now)
     return _slots(business, service, schedules, day, earliest)
 
 

@@ -1,6 +1,7 @@
 from datetime import UTC, date, datetime, time, timedelta
 
 import pytest
+from django.utils import timezone
 
 from appointments.models import Booking
 from businesses.models import StaffMember, TimeOff, WorkingHours
@@ -84,6 +85,23 @@ def test_cancelled_bookings_do_not_block(service, staff):
     make_booking(service, staff, at(monday, 10), status=Booking.Status.CANCELLED)
 
     assert availability.is_available(service, staff, at(monday, 10))
+
+
+def test_unconfirmed_bookings_block_until_their_hold_runs_out(service, staff):
+    monday = next_weekday(0)
+    now = timezone.now()
+    booking = make_booking(
+        service,
+        staff,
+        at(monday, 10),
+        status=Booking.Status.PENDING,
+        hold_expires_at=now + timedelta(minutes=10),
+    )
+
+    assert not availability.is_available(service, staff, at(monday, 10), now=now)
+    assert availability.is_available(
+        service, staff, at(monday, 10), now=booking.hold_expires_at + timedelta(seconds=1)
+    )
 
 
 def test_booking_window_starts_on_the_business_s_local_date(business):

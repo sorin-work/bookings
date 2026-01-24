@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, time, timedelta
 from functools import partial
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Count, Q
 from django.utils import timezone
@@ -89,6 +90,11 @@ def create_booking(service, start, customer, staff=None, *, now=None):
             customer_email=customer.email,
             customer_phone=customer.phone,
             status=Booking.Status.PENDING if pending else Booking.Status.CONFIRMED,
+            hold_expires_at=(
+                now + timedelta(minutes=settings.BOOKING_CONFIRMATION_HOLD_MINUTES)
+                if pending
+                else None
+            ),
         )
         _after_commit(emails.booking_created, booking)
     return booking
@@ -137,7 +143,15 @@ def confirm_booking(booking, *, now=None):
     now = now or timezone.now()
     if booking.status != Booking.Status.PENDING:
         return booking
-    booking.status = Booking.Status.CONFIRMED
-    booking.save(update_fields=["status", "updated_at"])
-    _after_commit(emails.booking_confirmed, booking)
+    with transaction.atomic():
+        # When the hold ran out, it can still go ahead if nobody took the time since.
+        expired = booking.hold_expires_at and booking.hold_expires_at <= now
+        if expired and not availability.is_available(
+            booking.service, booking.staff, booking.start, now=now
+        ):
+            raise SlotUnavailable
+        booking.status = Booking.Status.CONFIRMED
+        booking.hold_expires_at = None
+        booking.save(update_fields=["status", "hold_expires_at", "updated_at"])
+        _after_commit(emails.booking_confirmed, booking)
     return booking

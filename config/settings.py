@@ -125,6 +125,9 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Bookings <no-reply@bo
 # Absolute links in emails (booking links, password resets) start with this.
 SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000").rstrip("/")
 
+# How long an unconfirmed booking keeps its slot while the customer confirms by email.
+BOOKING_CONFIRMATION_HOLD_MINUTES = 30
+
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOGGING = {
     "version": 1,

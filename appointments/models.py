@@ -3,6 +3,7 @@ import uuid
 from datetime import timedelta
 
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 from businesses.models import Business, Service, StaffMember
@@ -16,9 +17,16 @@ def new_reference():
 
 
 class BookingQuerySet(models.QuerySet):
-    def blocking(self):
-        """Bookings that take up the staff member's time."""
-        return self.exclude(status=Booking.Status.CANCELLED)
+    def blocking(self, now=None):
+        """Bookings that take up the staff member's time.
+
+        Unconfirmed bookings only count while their hold hasn't run out.
+        """
+        now = now or timezone.now()
+        return self.filter(
+            Q(status__in=Booking.ACTIVE_STATUSES)
+            | Q(status=Booking.Status.PENDING, hold_expires_at__gt=now)
+        )
 
     def upcoming(self, now=None):
         now = now or timezone.now()
@@ -57,6 +65,7 @@ class Booking(models.Model):
     customer_email = models.EmailField()
     customer_phone = models.CharField(max_length=32)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.CONFIRMED)
+    hold_expires_at = models.DateTimeField(null=True, blank=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
     cancelled_by = models.CharField(max_length=16, choices=CancelledBy.choices, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
