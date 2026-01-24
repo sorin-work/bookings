@@ -155,3 +155,10 @@ def confirm_booking(booking, *, now=None):
         booking.save(update_fields=["status", "hold_expires_at", "updated_at"])
         _after_commit(emails.booking_confirmed, booking)
     return booking
+
+
+def expire_unconfirmed(*, now=None):
+    """Close bookings whose confirmation hold ran out. Returns how many."""
+    now = now or timezone.now()
+    expired = Booking.objects.filter(status=Booking.Status.PENDING, hold_expires_at__lte=now)
+    return expired.update(status=Booking.Status.EXPIRED, updated_at=now)
