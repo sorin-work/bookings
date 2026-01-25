@@ -78,6 +78,7 @@ DEBUG=true python manage.py runserver
 The app connects to `postgres://bookings:bookings@localhost:5446/bookings` by default;
 set `DATABASE_URL` to use another database. Without `EMAIL_HOST`, emails are printed to
 the console.
+`make db`, `make run`, `make test` and `make lint` wrap the usual commands.
 
 ## Tests
 
