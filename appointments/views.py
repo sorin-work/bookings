@@ -190,12 +190,18 @@ def manage_cancel(request, token):
 
 def manage_reschedule(request, token):
     booking = _booking(token)
+    if not booking.is_open:
+        messages.error(request, "This booking can't be changed any more.")
+        return redirect(booking.manage_url)
     if request.method == "POST":
         start = _parse_start(request.POST.get("start"))
         try:
             services.reschedule_booking(booking, start)
         except services.SlotUnavailable:
             messages.error(request, "Sorry, that time isn't free any more. Please pick another.")
+        except services.BookingClosed:
+            messages.error(request, "This booking can't be changed any more.")
+            return redirect(booking.manage_url)
         else:
             messages.success(request, "Your booking has been moved.")
             return redirect(booking.manage_url)

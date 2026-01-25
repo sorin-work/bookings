@@ -20,6 +20,10 @@ class SlotUnavailable(Exception):
     """The requested time isn't free (any more)."""
 
 
+class BookingClosed(Exception):
+    """The booking was cancelled or is over, so it can't be changed."""
+
+
 @dataclass
 class Customer:
     name: str
@@ -112,6 +116,8 @@ def cancel_booking(booking, by, *, now=None):
 def reschedule_booking(booking, start, *, now=None):
     """Move a booking to a new start time with the same staff member."""
     now = now or timezone.now()
+    if not booking.is_open:
+        raise BookingClosed
     with transaction.atomic():
         if not availability.is_available(booking.service, booking.staff, start, now=now):
             raise SlotUnavailable

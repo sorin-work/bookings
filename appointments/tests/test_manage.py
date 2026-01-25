@@ -82,3 +82,19 @@ def test_cannot_move_to_a_taken_time(client, booking, service, staff):
     assert response.status_code == 200
     booking.refresh_from_db()
     assert booking.start == at(next_weekday(0), 10)
+
+
+def test_cancelled_booking_cannot_be_moved(client, booking):
+    booking.status = Booking.Status.CANCELLED
+    booking.save()
+    new_start = at(next_weekday(2), 14)
+
+    response = client.post(
+        reverse("appointments:manage_reschedule", args=[make_token(booking)]),
+        {"start": new_start.isoformat()},
+    )
+
+    assert response.status_code == 302
+    booking.refresh_from_db()
+    assert booking.start == at(next_weekday(0), 10)
+    assert booking.status == Booking.Status.CANCELLED
