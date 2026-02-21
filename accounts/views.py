@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth import views as auth_views
 from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
 
 from .forms import LoginForm, SignupForm
 
@@ -26,3 +27,15 @@ class LoginView(auth_views.LoginView):
 
 class LogoutView(auth_views.LogoutView):
     pass
+
+
+class PasswordResetView(auth_views.PasswordResetView):
+    template_name = "accounts/password_reset.html"
+    email_template_name = "accounts/emails/password_reset.txt"
+    subject_template_name = "accounts/emails/password_reset_subject.txt"
+    success_url = reverse_lazy("accounts:password_reset_done")
+
+
+class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = "accounts/password_reset_confirm.html"
+    success_url = reverse_lazy("accounts:password_reset_complete")
