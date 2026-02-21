@@ -39,3 +39,12 @@ class PasswordResetView(auth_views.PasswordResetView):
 class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
     template_name = "accounts/password_reset_confirm.html"
     success_url = reverse_lazy("accounts:password_reset_complete")
+
+
+class PasswordChangeView(auth_views.PasswordChangeView):
+    template_name = "accounts/password_change.html"
+    success_url = reverse_lazy("businesses:settings")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Your password has been changed.")
+        return super().form_valid(form)
