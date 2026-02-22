@@ -46,6 +46,10 @@ class Booking(models.Model):
         CUSTOMER = "customer", "Customer"
         BUSINESS = "business", "Business"
 
+    class Source(models.TextChoices):
+        ONLINE = "online", "Booking page"
+        DASHBOARD = "dashboard", "Added by the business"
+
     # Statuses that count as a real appointment, in the past or the future.
     ACTIVE_STATUSES = [Status.CONFIRMED, Status.COMPLETED, Status.NO_SHOW]
     CLOSED_STATUSES = [Status.CANCELLED, Status.EXPIRED]
@@ -66,6 +70,7 @@ class Booking(models.Model):
     customer_email = models.EmailField()
     customer_phone = models.CharField(max_length=32)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.CONFIRMED)
+    source = models.CharField(max_length=16, choices=Source.choices, default=Source.ONLINE)
     hold_expires_at = models.DateTimeField(null=True, blank=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
     cancelled_by = models.CharField(max_length=16, choices=CancelledBy.choices, blank=True)

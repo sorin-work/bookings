@@ -1,0 +1,27 @@
+{% extends "app.html" %}
+{% block title %}Add booking · {{ business.name }}{% endblock %}
+{% block content %}
+<h1>Add a booking</h1>
+<p class="muted">For bookings made by phone or in person. The customer gets the usual confirmation email with their booking link.</p>
+<form method="post" class="card form" novalidate>
+  {% csrf_token %}
+  {% include "includes/form_errors.html" %}
+  <div class="form-row">
+    {% include "includes/field.html" with field=form.service %}
+    {% include "includes/field.html" with field=form.staff %}
+  </div>
+  <div class="form-row">
+    {% include "includes/field.html" with field=form.date %}
+    {% include "includes/field.html" with field=form.time %}
+  </div>
+  {% include "includes/field.html" with field=form.customer_name %}
+  <div class="form-row">
+    {% include "includes/field.html" with field=form.customer_email %}
+    {% include "includes/field.html" with field=form.customer_phone %}
+  </div>
+  <div class="actions">
+    <button type="submit" class="button button-primary">Add booking</button>
+    <a href="{% url 'dashboard:calendar' %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

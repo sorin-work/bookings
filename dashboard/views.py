@@ -2,6 +2,7 @@ from datetime import date, timedelta
 
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -10,6 +11,7 @@ from appointments.models import Booking
 from businesses.decorators import business_required
 
 from . import calendar, stats
+from .forms import ManualBookingForm
 
 
 @business_required
@@ -108,3 +110,30 @@ def booking_cancel(request, pk):
         services.cancel_booking(booking, Booking.CancelledBy.BUSINESS)
         messages.success(request, "Booking cancelled. The customer has been emailed.")
     return _after_action(request, booking)
+
+
+@business_required
+def booking_new(request):
+    business = request.business
+    initial = {}
+    form = ManualBookingForm(request.POST or None, business=business, initial=initial)
+    if request.method == "POST" and form.is_valid():
+        data = form.cleaned_data
+        customer = services.Customer(
+            name=data["customer_name"], email=data["customer_email"], phone=data["customer_phone"]
+        )
+        try:
+            booking = services.create_booking(
+                data["service"],
+                data["start"],
+                customer,
+                data["staff"],
+                source=Booking.Source.DASHBOARD,
+            )
+        except services.SlotUnavailable:
+            form.add_error(None, f"{data['staff'].name} isn't free at that time.")
+        else:
+            messages.success(request, f"Booked {booking.customer_name} in. They've been emailed.")
+            url = reverse("dashboard:calendar")
+            return redirect(f"{url}?date={booking.local_start.date().isoformat()}")
+    return render(request, "dashboard/booking_new.html", {"form": form})

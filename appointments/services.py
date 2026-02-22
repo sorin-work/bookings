@@ -66,7 +66,7 @@ def free_staff(service, start, staff=None, now=None):
     return _least_busy_first(service.business, free, start)
 
 
-def create_booking(service, start, customer, staff=None, *, now=None):
+def create_booking(service, start, customer, staff=None, *, source=None, now=None):
     """Book `service` at `start` (an aware datetime).
 
     Without `staff`, whoever is free and least busy that day gets the booking.
@@ -74,12 +74,13 @@ def create_booking(service, start, customer, staff=None, *, now=None):
     """
     business = service.business
     now = now or timezone.now()
+    source = source or Booking.Source.ONLINE
     if staff is None:
         free = free_staff(service, start, now=now)
         if not free:
             raise SlotUnavailable
         staff = free[0]
-    pending = business.require_confirmation
+    pending = business.require_confirmation and source == Booking.Source.ONLINE
     with transaction.atomic():
         booking = Booking.objects.create(
             business=business,
@@ -93,6 +94,7 @@ def create_booking(service, start, customer, staff=None, *, now=None):
             customer_name=customer.name,
             customer_email=customer.email,
             customer_phone=customer.phone,
+            source=source,
             status=Booking.Status.PENDING if pending else Booking.Status.CONFIRMED,
             hold_expires_at=(
                 now + timedelta(minutes=settings.BOOKING_CONFIRMATION_HOLD_MINUTES)

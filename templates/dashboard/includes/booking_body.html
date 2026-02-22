@@ -11,7 +11,7 @@
     <dt>Email</dt><dd><a href="mailto:{{ booking.customer_email }}">{{ booking.customer_email }}</a></dd>
     <dt>Phone</dt><dd><a href="tel:{{ booking.customer_phone }}">{{ booking.customer_phone }}</a></dd>
     <dt>Reference</dt><dd>{{ booking.reference }}</dd>
-    <dt>Booked</dt><dd>{{ booking.created_at|date:"j M Y, H:i" }}</dd>
+    <dt>Booked</dt><dd>{{ booking.created_at|date:"j M Y, H:i" }} · {{ booking.get_source_display|lower }}</dd>
   </dl>
 </div>
 <div class="actions">

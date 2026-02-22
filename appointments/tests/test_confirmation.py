@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from appointments.models import Booking
+from appointments.services import Customer, create_booking
 from appointments.tokens import make_token
 from scheduling import availability
 from testutils import at, next_weekday
@@ -83,3 +84,15 @@ def test_expire_command(needs_confirmation, service, staff, client):
 
     assert Booking.objects.get().status == Booking.Status.EXPIRED
     assert "Expired 1 unconfirmed booking." in out.getvalue()
+
+
+def test_bookings_from_the_dashboard_skip_confirmation(needs_confirmation, service, staff):
+    booking = create_booking(
+        service,
+        at(next_weekday(0), 10),
+        Customer("Ana", "ana@example.com", "07700900123"),
+        staff,
+        source=Booking.Source.DASHBOARD,
+    )
+
+    assert booking.status == Booking.Status.CONFIRMED

@@ -105,7 +105,8 @@ def booking_created(booking):
         _customer("pending", booking)
     else:
         _customer("created", booking, attach_ics=True)
-    _business("pending" if booking.status == booking.Status.PENDING else "created", booking)
+    if booking.source == booking.Source.ONLINE:
+        _business("pending" if booking.status == booking.Status.PENDING else "created", booking)
 
 
 def booking_cancelled(booking):
