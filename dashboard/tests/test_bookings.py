@@ -1,10 +1,57 @@
+from datetime import time
+
 import pytest
+from django.core import mail
 from django.urls import reverse
 
 from appointments.models import Booking
+from businesses.models import StaffMember
 from testutils import at, make_booking, next_weekday
 
 pytestmark = pytest.mark.django_db
+
+
+def manual_data(service, staff, day, hour, **overrides):
+    data = {
+        "service": service.pk,
+        "staff": staff.pk,
+        "date": day.isoformat(),
+        "time": time(hour).strftime("%H:%M"),
+        "customer_name": "Walk In",
+        "customer_email": "walk.in@example.com",
+        "customer_phone": "07700900999",
+    }
+    data.update(overrides)
+    return data
+
+
+def test_add_a_booking_from_the_dashboard(
+    owner_client, service, staff, django_capture_on_commit_callbacks
+):
+    monday = next_weekday(0)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        response = owner_client.post(
+            reverse("dashboard:booking_new"), manual_data(service, staff, monday, 11)
+        )
+
+    assert response.status_code == 302
+    booking = Booking.objects.get()
+    assert booking.start == at(monday, 11)
+    assert booking.source == Booking.Source.DASHBOARD
+    # The customer is emailed, the business isn't told about its own booking.
+    assert [m.to for m in mail.outbox] == [["walk.in@example.com"]]
+
+
+def test_staff_must_offer_the_service(owner_client, business, service, staff):
+    other = StaffMember.objects.create(business=business, name="Kit")
+
+    response = owner_client.post(
+        reverse("dashboard:booking_new"), manual_data(service, other, next_weekday(0), 11)
+    )
+
+    assert response.status_code == 200
+    assert "offer Haircut" in response.content.decode()
 
 
 def test_bookings_list_filters(owner_client, service, staff):
