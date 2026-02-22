@@ -66,10 +66,12 @@ def free_staff(service, start, staff=None, now=None):
     return _least_busy_first(service.business, free, start)
 
 
-def create_booking(service, start, customer, staff=None, *, source=None, now=None):
+def create_booking(service, start, customer, staff=None, *, source=None, override=False, now=None):
     """Book `service` at `start` (an aware datetime).
 
     Without `staff`, whoever is free and least busy that day gets the booking.
+    With `override`, the availability check is skipped (the business booking someone
+    in outside the usual hours); a staff member is required then.
     Raises SlotUnavailable if nobody can take it.
     """
     business = service.business

@@ -54,6 +54,18 @@ def test_staff_must_offer_the_service(owner_client, business, service, staff):
     assert "offer Haircut" in response.content.decode()
 
 
+def test_override_books_outside_working_hours(owner_client, service, staff):
+    saturday = next_weekday(5)
+
+    response = owner_client.post(
+        reverse("dashboard:booking_new"),
+        manual_data(service, staff, saturday, 10, override="on"),
+    )
+
+    assert response.status_code == 302
+    assert Booking.objects.get().start == at(saturday, 10)
+
+
 def test_bookings_list_filters(owner_client, service, staff):
     monday = next_weekday(0)
     make_booking(service, staff, at(monday, 10), customer_name="Ana Lima")

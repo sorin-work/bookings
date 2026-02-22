@@ -18,6 +18,11 @@ class ManualBookingForm(forms.Form):
         label="Customer email", help_text="They get the confirmation and the booking link."
     )
     customer_phone = forms.CharField(max_length=32, label="Customer phone")
+    override = forms.BooleanField(
+        required=False,
+        label="Book even if it isn't a free time",
+        help_text="For appointments outside working hours or squeezed in between others.",
+    )
 
     def __init__(self, *args, business, **kwargs):
         super().__init__(*args, **kwargs)

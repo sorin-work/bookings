@@ -129,9 +129,14 @@ def booking_new(request):
                 customer,
                 data["staff"],
                 source=Booking.Source.DASHBOARD,
+                override=data["override"],
             )
         except services.SlotUnavailable:
-            form.add_error(None, f"{data['staff'].name} isn't free at that time.")
+            form.add_error(
+                None,
+                f"{data['staff'].name} isn't free at that time. "
+                "Tick the box below to book it anyway.",
+            )
         else:
             messages.success(request, f"Booked {booking.customer_name} in. They've been emailed.")
             url = reverse("dashboard:calendar")

@@ -19,6 +19,7 @@
     {% include "includes/field.html" with field=form.customer_email %}
     {% include "includes/field.html" with field=form.customer_phone %}
   </div>
+  {% include "includes/field.html" with field=form.override %}
   <div class="actions">
     <button type="submit" class="button button-primary">Add booking</button>
     <a href="{% url 'dashboard:calendar' %}">Cancel</a>
