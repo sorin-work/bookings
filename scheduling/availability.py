@@ -47,11 +47,12 @@ def load_schedules(business, staff_members, first_day, last_day, *, now=None):
         shifts[row.staff_id].append(Shift(row.weekday, row.start_time, row.end_time))
 
     busy = defaultdict(list)
-    for staff_id in staff_ids:
-        for booking in Booking.objects.blocking(now).filter(
-            staff_id=staff_id, start__lt=range_end, end__gt=range_start
-        ):
-            busy[staff_id].append(Interval(booking.busy_start, booking.busy_end))
+    bookings = Booking.objects.blocking(now).filter(
+        staff_id__in=staff_ids, start__lt=range_end, end__gt=range_start
+    )
+    fields = ["staff_id", "start", "end", "buffer_before_minutes", "buffer_after_minutes"]
+    for booking in bookings.only(*fields):
+        busy[booking.staff_id].append(Interval(booking.busy_start, booking.busy_end))
     time_off = TimeOff.objects.filter(
         staff_id__in=staff_ids, start__gte=range_start, start__lt=range_end
     )
