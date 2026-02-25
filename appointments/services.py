@@ -66,6 +66,16 @@ def free_staff(service, start, staff=None, now=None):
     return _least_busy_first(service.business, free, start)
 
 
+def _lock_staff(members):
+    """Lock the staff rows so two requests for the same time can't both pass the check.
+
+    The second request waits here until the first one has committed its booking, and
+    then sees it when checking availability.
+    """
+    ids = sorted({m.pk for m in members})
+    list(StaffMember.objects.select_for_update().filter(pk__in=ids).order_by("pk"))
+
+
 def create_booking(service, start, customer, staff=None, *, source=None, override=False, now=None):
     """Book `service` at `start` (an aware datetime).
 
@@ -77,13 +87,18 @@ def create_booking(service, start, customer, staff=None, *, source=None, overrid
     business = service.business
     now = now or timezone.now()
     source = source or Booking.Source.ONLINE
-    if staff is None:
-        free = free_staff(service, start, now=now)
-        if not free:
-            raise SlotUnavailable
-        staff = free[0]
     pending = business.require_confirmation and source == Booking.Source.ONLINE
     with transaction.atomic():
+        if override:
+            if staff is None:
+                raise ValueError("Pick a staff member when booking outside the free times.")
+        else:
+            candidates = [staff] if staff else list(availability.bookable_staff(service))
+            _lock_staff(candidates)
+            free = free_staff(service, start, staff=staff, now=now)
+            if not free:
+                raise SlotUnavailable
+            staff = free[0]
         booking = Booking.objects.create(
             business=business,
             service=service,
@@ -123,6 +138,7 @@ def reschedule_booking(booking, start, *, now=None):
     if not booking.is_open:
         raise BookingClosed
     with transaction.atomic():
+        _lock_staff([booking.staff])
         if not availability.is_available(booking.service, booking.staff, start, now=now):
             raise SlotUnavailable
         old_start = booking.start
@@ -154,6 +170,7 @@ def confirm_booking(booking, *, now=None):
     if booking.status != Booking.Status.PENDING:
         return booking
     with transaction.atomic():
+        _lock_staff([booking.staff])
         # When the hold ran out, it can still go ahead if nobody took the time since.
         expired = booking.hold_expires_at and booking.hold_expires_at <= now
         if expired and not availability.is_available(

@@ -5,6 +5,7 @@ import pytest
 from django.urls import reverse
 
 from appointments.models import Booking
+from appointments.services import Customer, SlotUnavailable, create_booking
 from businesses.models import Service, StaffMember, WorkingHours
 from testutils import at, make_booking, next_weekday
 
@@ -124,3 +125,11 @@ def test_slots_without_a_proper_day_are_a_404(client, business, service, staff, 
     url = reverse("appointments:slots", args=[business.slug, service.pk])
 
     assert client.get(url, {"date": value}).status_code == 404
+
+
+def test_create_booking_checks_the_time_again(service, staff):
+    start = at(next_weekday(0), 10)
+    make_booking(service, staff, start)
+
+    with pytest.raises(SlotUnavailable):
+        create_booking(service, start, Customer("Bo", "bo@example.com", "07700900456"), staff)

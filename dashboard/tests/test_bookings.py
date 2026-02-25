@@ -43,6 +43,18 @@ def test_add_a_booking_from_the_dashboard(
     assert [m.to for m in mail.outbox] == [["walk.in@example.com"]]
 
 
+def test_dashboard_booking_must_be_free(owner_client, service, staff):
+    monday = next_weekday(0)
+    make_booking(service, staff, at(monday, 11))
+
+    response = owner_client.post(
+        reverse("dashboard:booking_new"), manual_data(service, staff, monday, 11)
+    )
+
+    assert response.status_code == 200
+    assert Booking.objects.count() == 1
+
+
 def test_staff_must_offer_the_service(owner_client, business, service, staff):
     other = StaffMember.objects.create(business=business, name="Kit")
 
