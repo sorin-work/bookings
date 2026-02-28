@@ -13,7 +13,7 @@ from .slots import Interval, ServiceSpec, Shift, StaffSchedule, staff_slots
 
 def bookable_staff(service):
     """Staff who can be booked for `service`, in a stable order."""
-    return service.staff.order_by("name", "pk")
+    return service.staff.filter(is_active=True).order_by("name", "pk")
 
 
 def booking_window(business, now=None):

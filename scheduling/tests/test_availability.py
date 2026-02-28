@@ -104,6 +104,14 @@ def test_unconfirmed_bookings_block_until_their_hold_runs_out(service, staff):
     )
 
 
+def test_inactive_staff_are_not_offered(service, staff):
+    staff.is_active = False
+    staff.save()
+
+    assert list(availability.bookable_staff(service)) == []
+    assert availability.available_slots(service, next_weekday(0)) == []
+
+
 def test_booking_window_starts_on_the_business_s_local_date(business):
     business.timezone = "Pacific/Auckland"
     business.min_notice_minutes = 0
