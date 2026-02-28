@@ -39,7 +39,7 @@ def calendar_view(request):
     business = request.business
     day = _parse_day(request.GET.get("date"), business.today())
     view = request.GET.get("view") if request.GET.get("view") in ("day", "week") else "day"
-    staff = business.staff.prefetch_related("working_hours")
+    staff = business.staff.filter(is_active=True).prefetch_related("working_hours")
     selected_staff = None
     if request.GET.get("staff", "").isdigit():
         selected_staff = staff.filter(pk=int(request.GET["staff"])).first()

@@ -28,7 +28,7 @@ class ManualBookingForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.business = business
         self.fields["service"].queryset = business.services.filter(is_active=True)
-        self.fields["staff"].queryset = business.staff.all()
+        self.fields["staff"].queryset = business.staff.filter(is_active=True)
 
     def clean_customer_phone(self):
         return clean_phone_number(self.cleaned_data["customer_phone"])

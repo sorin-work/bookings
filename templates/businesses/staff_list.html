@@ -13,6 +13,7 @@
     <tr>
       <td>
         <a href="{% url 'businesses:staff_edit' member.pk %}">{{ member.name }}</a>
+        {% if not member.is_active %}<span class="badge">Inactive</span>{% endif %}
         {% if member.email %}<div class="muted small">{{ member.email }}</div>{% endif %}
       </td>
       <td>{% for service in member.services.all %}{{ service.name }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="muted">None yet</span>{% endfor %}</td>

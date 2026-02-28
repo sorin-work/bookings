@@ -65,6 +65,7 @@ class StaffForm(forms.ModelForm):
             "name",
             "email",
             "services",
+            "is_active",
         ]
         widgets = {
             "services": forms.CheckboxSelectMultiple,

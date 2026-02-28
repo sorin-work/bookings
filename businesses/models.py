@@ -125,6 +125,9 @@ class StaffMember(models.Model):
     name = models.CharField(max_length=120)
     email = models.EmailField(blank=True)
     services = models.ManyToManyField(Service, related_name="staff", blank=True)
+    is_active = models.BooleanField(
+        default=True, help_text="Inactive staff keep their history but can't be booked."
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
