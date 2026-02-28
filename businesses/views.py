@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -65,6 +66,9 @@ def service_form(request, pk=None):
     if request.method == "POST" and form.is_valid():
         service = form.save(commit=False)
         service.business = business
+        if service.pk is None:
+            last = business.services.order_by("-position").first()
+            service.position = last.position + 1 if last else 0
         service.save()
         messages.success(request, f"Saved {service.name}.")
         return redirect("businesses:services")
@@ -84,6 +88,24 @@ def service_archive(request, pk):
             request,
             f"Archived {service.name}. Existing bookings stay, but it can't be booked any more.",
         )
+    return redirect("businesses:services")
+
+
+@business_required
+@require_POST
+def service_move(request, pk, direction):
+    if direction not in ("up", "down"):
+        raise Http404
+    services = list(request.business.services.filter(is_active=True))
+    index = next((i for i, s in enumerate(services) if s.pk == pk), None)
+    if index is None:
+        return redirect("businesses:services")
+    other = index - 1 if direction == "up" else index + 1
+    if 0 <= other < len(services):
+        services[index], services[other] = services[other], services[index]
+        for position, service in enumerate(services):
+            service.position = position
+        type(services[0]).objects.bulk_update(services, ["position"])
     return redirect("businesses:services")
 
 

@@ -11,6 +11,7 @@ urlpatterns = [
     path("services/new/", views.service_form, name="service_new"),
     path("services/<int:pk>/edit/", views.service_form, name="service_edit"),
     path("services/<int:pk>/archive/", views.service_archive, name="service_archive"),
+    path("services/<int:pk>/move/<str:direction>/", views.service_move, name="service_move"),
     path("staff/", views.staff_list, name="staff"),
     path("staff/new/", views.staff_form, name="staff_new"),
     path("staff/<int:pk>/edit/", views.staff_form, name="staff_edit"),

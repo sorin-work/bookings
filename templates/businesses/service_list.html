@@ -25,6 +25,8 @@
       </td>
       <td class="num">{{ service.price|money }}</td>
       <td class="actions" style="margin: 0; justify-content: flex-end">
+        <form method="post" action="{% url 'businesses:service_move' service.pk 'up' %}">{% csrf_token %}<button class="button-small" {% if forloop.first %}disabled{% endif %} title="Move up">↑</button></form>
+        <form method="post" action="{% url 'businesses:service_move' service.pk 'down' %}">{% csrf_token %}<button class="button-small" {% if forloop.last %}disabled{% endif %} title="Move down">↓</button></form>
         <form method="post" action="{% url 'businesses:service_archive' service.pk %}">{% csrf_token %}<button class="button-small">Archive</button></form>
       </td>
     </tr>

@@ -72,3 +72,15 @@ def test_archive_and_restore(owner_client, service):
     owner_client.post(reverse("businesses:service_archive", args=[service.pk]))
     service.refresh_from_db()
     assert service.is_active
+
+
+def test_move_a_service_up(owner_client, business, service):
+    second = Service.objects.create(
+        business=business, name="Beard trim", duration_minutes=15, price=10, position=1
+    )
+    service.position = 0
+    service.save()
+
+    owner_client.post(reverse("businesses:service_move", args=[second.pk, "up"]))
+
+    assert list(business.services.all()) == [second, service]

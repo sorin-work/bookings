@@ -129,7 +129,7 @@ class Command(BaseCommand):
 
     def _services(self, business):
         services = []
-        for name, minutes, price, before, after, description in SERVICES:
+        for position, (name, minutes, price, before, after, description) in enumerate(SERVICES):
             services.append(
                 Service.objects.create(
                     business=business,
@@ -139,6 +139,7 @@ class Command(BaseCommand):
                     price=Decimal(price),
                     buffer_before_minutes=before,
                     buffer_after_minutes=after,
+                    position=position,
                 )
             )
         return services

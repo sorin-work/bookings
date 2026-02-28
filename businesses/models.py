@@ -111,10 +111,11 @@ class Service(models.Model):
         help_text="Time kept free afterwards, for example to clean up.",
     )
     is_active = models.BooleanField(default=True)
+    position = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["position", "name"]
 
     def __str__(self):
         return self.name
