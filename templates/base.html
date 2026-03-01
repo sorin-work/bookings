@@ -9,7 +9,7 @@
   <script src="{% static 'js/htmx.min.js' %}" defer></script>
   {% block head %}{% endblock %}
 </head>
-<body class="{% block body_class %}{% endblock %}">
+<body class="{% block body_class %}{% endblock %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
   {% block body %}
   <main class="container">
     {% include "includes/messages.html" %}
