@@ -1,4 +1,5 @@
 from datetime import date, time, timedelta
+from zoneinfo import ZoneInfo
 
 from scheduling.slots import Interval, ServiceSpec, Shift, StaffSchedule, staff_slots
 from testutils import LONDON, at
@@ -152,3 +153,35 @@ def test_touching_intervals_do_not_overlap():
 
     assert not first.overlaps(Interval(at(MONDAY, 10), at(MONDAY, 11)))
     assert first.overlaps(Interval(at(MONDAY, 9, 59), at(MONDAY, 11)))
+
+
+def test_slots_keep_wall_clock_times_after_the_clocks_go_forward():
+    # Looking at the Monday after British Summer Time starts (29 March 2026)
+    # from a week before it.
+    day = date(2026, 3, 30)
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(11))),
+        ServiceSpec(HOUR),
+        day,
+        LONDON,
+        interval=HOUR,
+        earliest=at(date(2026, 3, 20), 12),
+    )
+
+    assert slots[0].start.astimezone(LONDON).isoformat() == "2026-03-30T09:00:00+01:00"
+    assert starts(slots)[0] == "09:00"
+
+
+def test_slots_for_a_business_west_of_utc_after_the_clocks_go_back():
+    new_york = ZoneInfo("America/New_York")
+    day = date(2026, 11, 2)  # US daylight saving time ended on 1 November
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(11))),
+        ServiceSpec(HOUR),
+        day,
+        new_york,
+        interval=HOUR,
+        earliest=at(date(2026, 10, 20), 9, tz=new_york),
+    )
+
+    assert slots[0].start.isoformat() == "2026-11-02T14:00:00+00:00"

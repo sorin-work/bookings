@@ -64,9 +64,8 @@ def staff_slots(schedule, service, day, tz, *, interval, earliest=None):
     for shift in schedule.shifts:
         if shift.weekday != day.weekday():
             continue
-        offset = (earliest or datetime.now(UTC)).astimezone(tz).utcoffset()
-        window_start = (datetime.combine(day, shift.start) - offset).replace(tzinfo=UTC)
-        window_end = (datetime.combine(day, shift.end) - offset).replace(tzinfo=UTC)
+        window_start = datetime.combine(day, shift.start, tzinfo=tz).astimezone(UTC)
+        window_end = datetime.combine(day, shift.end, tzinfo=tz).astimezone(UTC)
         start = window_start
         while True:
             end = start + service.duration
