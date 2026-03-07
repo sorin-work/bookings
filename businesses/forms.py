@@ -65,10 +65,12 @@ class StaffForm(forms.ModelForm):
             "name",
             "email",
             "services",
+            "color",
             "is_active",
         ]
         widgets = {
             "services": forms.CheckboxSelectMultiple,
+            "color": forms.TextInput(attrs={"type": "color"}),
         }
         help_texts = {
             "email": "Optional. Used to send staff a copy of their bookings.",

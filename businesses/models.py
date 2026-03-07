@@ -3,12 +3,14 @@ from functools import cached_property
 from zoneinfo import ZoneInfo
 
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 from django.db.models import F, Q
 from django.utils import timezone
 
 from .timezones import validate_timezone
+
+HEX_COLOR = r"^#[0-9a-fA-F]{6}$"
 
 
 class Business(models.Model):
@@ -126,6 +128,11 @@ class StaffMember(models.Model):
     name = models.CharField(max_length=120)
     email = models.EmailField(blank=True)
     services = models.ManyToManyField(Service, related_name="staff", blank=True)
+    color = models.CharField(
+        max_length=7,
+        default="#2563eb",
+        validators=[RegexValidator(HEX_COLOR, "Use a colour like #2563eb.")],
+    )
     is_active = models.BooleanField(
         default=True, help_text="Inactive staff keep their history but can't be booked."
     )

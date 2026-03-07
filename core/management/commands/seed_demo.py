@@ -146,11 +146,12 @@ class Command(BaseCommand):
 
     def _staff(self, business, services):
         members = []
-        for name, email, _color, service_indexes, hours in STAFF:
+        for name, email, color, service_indexes, hours in STAFF:
             member = StaffMember.objects.create(
                 business=business,
                 name=name,
                 email=email,
+                color=color,
             )
             member.services.set([services[i] for i in service_indexes])
             for weekday, shifts in hours.items():

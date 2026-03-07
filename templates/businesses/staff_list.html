@@ -12,6 +12,7 @@
     {% for member in staff %}
     <tr>
       <td>
+        <span class="badge" style="background: {{ member.color }}; border-color: {{ member.color }}">&nbsp;</span>
         <a href="{% url 'businesses:staff_edit' member.pk %}">{{ member.name }}</a>
         {% if not member.is_active %}<span class="badge">Inactive</span>{% endif %}
         {% if member.email %}<div class="muted small">{{ member.email }}</div>{% endif %}
