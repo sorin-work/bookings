@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, time, timedelta
 
 from appointments.models import Booking
+from businesses.models import TimeOff
 
 DEFAULT_START_HOUR = 8
 DEFAULT_END_HOUR = 18
@@ -21,11 +22,19 @@ class Event:
 
 
 @dataclass
+class Block:
+    label: str
+    top: float
+    height: float
+
+
+@dataclass
 class Column:
     label: str
     day: object
     staff: object = None
     events: list = field(default_factory=list)
+    blocks: list = field(default_factory=list)
 
 
 @dataclass
@@ -91,6 +100,17 @@ def _fill(grid, business, bookings, time_off=()):
             )
             if position:
                 column.events.append(Event(booking, *position))
+        for item in time_off:
+            if column.staff is not None and item.staff_id != column.staff.pk:
+                continue
+            position = _position(
+                item.start, item.end, column.day, grid.start_hour, grid.end_hour, tz
+            )
+            if position:
+                label = item.reason or "Time off"
+                if column.staff is None:
+                    label = f"{item.staff.name}: {label}"
+                column.blocks.append(Block(label, *position))
     return grid
 
 
@@ -106,6 +126,16 @@ def _bookings(business, staff, first_day, last_day):
     )
 
 
+def _time_off(staff, first_day, last_day, tz):
+    start = datetime.combine(first_day, time(0), tzinfo=tz)
+    end = datetime.combine(last_day + timedelta(days=1), time(0), tzinfo=tz)
+    return list(
+        TimeOff.objects.filter(staff__in=staff, start__lt=end, end__gt=start).select_related(
+            "staff"
+        )
+    )
+
+
 def day_grid(business, day, staff):
     """One column per staff member."""
     staff = list(staff)
@@ -113,7 +143,7 @@ def day_grid(business, day, staff):
     start_hour, end_hour = _visible_hours(staff, [day], bookings, business.tz)
     columns = [Column(label=member.name, day=day, staff=member) for member in staff]
     grid = Grid(columns, start_hour, end_hour)
-    return _fill(grid, business, bookings)
+    return _fill(grid, business, bookings, _time_off(staff, day, day, business.tz))
 
 
 def week_grid(business, day, staff):
@@ -125,4 +155,4 @@ def week_grid(business, day, staff):
     start_hour, end_hour = _visible_hours(staff, days, bookings, business.tz)
     columns = [Column(label=f"{d:%a %d}", day=d) for d in days]
     grid = Grid(columns, start_hour, end_hour)
-    return _fill(grid, business, bookings)
+    return _fill(grid, business, bookings, _time_off(staff, days[0], days[-1], business.tz))

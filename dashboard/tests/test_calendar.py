@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from accounts.models import User
 from appointments.models import Booking
-from businesses.models import Business
+from businesses.models import Business, TimeOff
 from dashboard import calendar
 from testutils import at, make_booking, next_weekday
 
@@ -143,3 +143,14 @@ def test_mistyped_date_shows_today(owner_client, business, staff):
 @pytest.mark.parametrize("day", [date(2026, 1, 5), date(2026, 1, 8), date(2026, 1, 11)])
 def test_week_starts_on_monday_for_every_day_of_the_week(day):
     assert calendar.week_start(day) == date(2026, 1, 5)
+
+
+def test_time_off_shows_in_the_grid(business, staff):
+    monday = next_weekday(0)
+    TimeOff.objects.create(staff=staff, start=at(monday, 13), end=at(monday, 15), reason="Dentist")
+
+    grid = calendar.day_grid(business, monday, [staff])
+
+    [block] = grid.columns[0].blocks
+    assert block.label == "Dentist"
+    assert block.top == pytest.approx(50)
