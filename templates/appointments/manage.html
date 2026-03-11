@@ -1,5 +1,6 @@
 {% extends "appointments/public_base.html" %}
 {% load ui %}
+{% block head %}{{ block.super }}<meta name="robots" content="noindex">{% endblock %}
 {% block content %}
 {% if is_new %}
 {% if booking.status == "pending" %}
