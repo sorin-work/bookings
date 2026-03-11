@@ -50,7 +50,8 @@ def _subject(template, booking):
         customer=booking.customer_name,
         when=f"{when:%a %d %b} at {when:%H:%M}",
     )
-    return subject
+    # Header values can't contain line breaks; Django refuses to send them.
+    return " ".join(subject.split())
 
 
 def _send(name, booking, to, subject, *, reply_to=None, attach_ics=False, **extra):

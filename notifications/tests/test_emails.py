@@ -110,3 +110,12 @@ def test_confirmation_has_a_calendar_file(send, service, staff):
     assert name == f"booking-{booking.reference}.ics"
     assert mimetype == "text/calendar"
     assert "BEGIN:VEVENT" in content
+
+
+def test_line_breaks_in_a_name_do_not_stop_the_email(send, service, staff):
+    _, sent = send(
+        services.create_booking, service, at(next_weekday(0), 10), customer("Ana\nLima"), staff
+    )
+
+    assert len(sent) == 2
+    assert all("\n" not in m.subject for m in sent)

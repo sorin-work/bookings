@@ -20,7 +20,8 @@ class CustomerForm(forms.Form):
     phone = forms.CharField(max_length=32, label="Phone")
 
     def clean_name(self):
-        return self.cleaned_data["name"].strip()
+        # Collapse line breaks and runs of spaces; names end up in email subjects.
+        return " ".join(self.cleaned_data["name"].split())
 
     def clean_email(self):
         return self.cleaned_data["email"].strip()
