@@ -18,6 +18,8 @@ class CustomerForm(forms.Form):
     name = forms.CharField(max_length=120, label="Your name")
     email = forms.EmailField(label="Email", help_text="We'll send the confirmation here.")
     phone = forms.CharField(max_length=32, label="Phone")
+    # Hidden from people with CSS; bots that fill in every field give themselves away.
+    website = forms.CharField(required=False, label="Leave this empty")
 
     def clean_name(self):
         # Collapse line breaks and runs of spaces; names end up in email subjects.
@@ -28,6 +30,11 @@ class CustomerForm(forms.Form):
 
     def clean_phone(self):
         return clean_phone_number(self.cleaned_data["phone"])
+
+    def clean_website(self):
+        if self.cleaned_data.get("website"):
+            raise forms.ValidationError("Please leave this field empty.")
+        return ""
 
     def customer(self):
         data = self.cleaned_data

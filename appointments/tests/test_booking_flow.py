@@ -133,3 +133,14 @@ def test_create_booking_checks_the_time_again(service, staff):
 
     with pytest.raises(SlotUnavailable):
         create_booking(service, start, Customer("Bo", "bo@example.com", "07700900456"), staff)
+
+
+def test_honeypot_stops_bots(client, business, service, staff):
+    start = at(next_weekday(0), 10)
+
+    response = client.post(
+        book_url(business, service, start, staff), customer_data(website="http://spam.example")
+    )
+
+    assert response.status_code == 200
+    assert not Booking.objects.exists()

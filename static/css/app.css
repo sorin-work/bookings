@@ -165,6 +165,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .button:focus-v
 .booking-summary dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 1rem; margin: 0; }
 .booking-summary dt { color: var(--muted); }
 .booking-summary dd { margin: 0; }
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 
 /* Calendar */
 .calendar-toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1rem; }
