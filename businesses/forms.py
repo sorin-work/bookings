@@ -25,6 +25,7 @@ class BusinessForm(forms.ModelForm):
             "slot_interval_minutes",
             "min_notice_minutes",
             "max_advance_days",
+            "cancellation_notice_hours",
             "require_confirmation",
         ]
         widgets = {
@@ -33,6 +34,7 @@ class BusinessForm(forms.ModelForm):
         labels = {
             "min_notice_minutes": "Minimum notice (minutes)",
             "max_advance_days": "Book up to (days ahead)",
+            "cancellation_notice_hours": "Cancellation notice (hours)",
         }
 
     def clean_slug(self):

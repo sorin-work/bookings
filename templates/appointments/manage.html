@@ -36,6 +36,8 @@
     <form method="post" action="{% url 'appointments:manage_cancel' token %}" onsubmit="return confirm('Cancel this booking?')">
       {% csrf_token %}<button type="submit" class="button button-danger">Cancel booking</button>
     </form>
+    {% elif booking.is_open %}
+    <p class="muted small">It's too close to the appointment to change it online. Please contact {{ business.name }}{% if business.phone %} on <a href="tel:{{ business.phone }}">{{ business.phone }}</a>{% endif %}.</p>
     {% endif %}
   </div>
 </div>

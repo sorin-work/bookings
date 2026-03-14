@@ -174,7 +174,7 @@ def manage(request, token):
         "business": booking.business,
         "token": token,
         "is_new": request.GET.get("new") == "1",
-        "can_change": booking.is_open,
+        "can_change": booking.customer_can_change(),
     }
     return render(request, "appointments/manage.html", context)
 
@@ -182,6 +182,13 @@ def manage(request, token):
 @require_POST
 def manage_cancel(request, token):
     booking = _booking(token)
+    if booking.is_open and not booking.customer_can_change():
+        messages.error(
+            request,
+            f"It's too close to the appointment to cancel online. "
+            f"Please contact {booking.business.name}.",
+        )
+        return redirect(booking.manage_url)
     if booking.is_open:
         services.cancel_booking(booking, Booking.CancelledBy.CUSTOMER)
         messages.success(request, "Your booking is cancelled.")
@@ -190,8 +197,15 @@ def manage_cancel(request, token):
 
 def manage_reschedule(request, token):
     booking = _booking(token)
-    if not booking.is_open:
-        messages.error(request, "This booking can't be changed any more.")
+    if not booking.customer_can_change():
+        if booking.is_open:
+            messages.error(
+                request,
+                f"It's too close to the appointment to change it online. "
+                f"Please contact {booking.business.name}.",
+            )
+        else:
+            messages.error(request, "This booking can't be changed any more.")
         return redirect(booking.manage_url)
     if request.method == "POST":
         start = _parse_start(request.POST.get("start"))

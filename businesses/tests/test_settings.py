@@ -19,6 +19,7 @@ def settings_data(business, **overrides):
         "slot_interval_minutes": 15,
         "min_notice_minutes": 120,
         "max_advance_days": 60,
+        "cancellation_notice_hours": 24,
     }
     data.update(overrides)
     return data

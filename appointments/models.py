@@ -116,3 +116,9 @@ class Booking(models.Model):
         from .tokens import manage_path
 
         return manage_path(self)
+
+    def customer_can_change(self, now=None):
+        """Customers can cancel or move a booking until the business's notice period."""
+        now = now or timezone.now()
+        cutoff = self.start - timedelta(hours=self.business.cancellation_notice_hours)
+        return self.is_open and now < cutoff

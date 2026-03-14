@@ -60,6 +60,10 @@ class Business(models.Model):
         default=False,
         help_text="Customers confirm their booking from a link in the email before it counts.",
     )
+    cancellation_notice_hours = models.PositiveSmallIntegerField(
+        default=24,
+        help_text="Customers can cancel or move a booking up to this many hours before it starts.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
