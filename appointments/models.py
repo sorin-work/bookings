@@ -69,6 +69,7 @@ class Booking(models.Model):
     customer_name = models.CharField(max_length=120)
     customer_email = models.EmailField()
     customer_phone = models.CharField(max_length=32)
+    customer_note = models.TextField(blank=True)
     status = models.CharField(max_length=16, choices=Status.choices, default=Status.CONFIRMED)
     source = models.CharField(max_length=16, choices=Source.choices, default=Source.ONLINE)
     hold_expires_at = models.DateTimeField(null=True, blank=True)

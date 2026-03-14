@@ -18,6 +18,12 @@ class CustomerForm(forms.Form):
     name = forms.CharField(max_length=120, label="Your name")
     email = forms.EmailField(label="Email", help_text="We'll send the confirmation here.")
     phone = forms.CharField(max_length=32, label="Phone")
+    note = forms.CharField(
+        required=False,
+        max_length=1000,
+        label="Anything we should know? (optional)",
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
     # Hidden from people with CSS; bots that fill in every field give themselves away.
     website = forms.CharField(required=False, label="Leave this empty")
 
@@ -42,4 +48,5 @@ class CustomerForm(forms.Form):
             name=data["name"],
             email=data["email"],
             phone=data["phone"],
+            note=data.get("note", ""),
         )

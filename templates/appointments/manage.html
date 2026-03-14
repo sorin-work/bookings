@@ -22,6 +22,7 @@
     <dt>When</dt><dd>{{ booking.start|date:"l j F Y" }}, {{ booking.start|date:"H:i" }}–{{ booking.end|date:"H:i" }}</dd>
     <dt>With</dt><dd>{{ booking.staff.name }}</dd>
     <dt>Name</dt><dd>{{ booking.customer_name }}</dd>
+    {% if booking.customer_note %}<dt>Your note</dt><dd>{{ booking.customer_note|linebreaksbr }}</dd>{% endif %}
     {% if business.address %}<dt>Where</dt><dd>{{ business.address }}</dd>{% endif %}
   </dl>
   <div class="actions">

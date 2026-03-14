@@ -4,4 +4,5 @@ Phone:     {{ booking.customer_phone }}
 Service:   {{ booking.service.name }}
 When:      {{ booking.start|date:"l j F Y" }}, {{ booking.start|date:"H:i" }}–{{ booking.end|date:"H:i" }}
 With:      {{ booking.staff.name }}
-Reference: {{ booking.reference }}{% endautoescape %}
+Reference: {{ booking.reference }}{% if booking.customer_note %}
+Note:      {{ booking.customer_note }}{% endif %}{% endautoescape %}

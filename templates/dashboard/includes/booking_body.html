@@ -12,6 +12,7 @@
     <dt>Phone</dt><dd><a href="tel:{{ booking.customer_phone }}">{{ booking.customer_phone }}</a></dd>
     <dt>Reference</dt><dd>{{ booking.reference }}</dd>
     <dt>Booked</dt><dd>{{ booking.created_at|date:"j M Y, H:i" }} · {{ booking.get_source_display|lower }}</dd>
+    {% if booking.customer_note %}<dt>Note</dt><dd>{{ booking.customer_note|linebreaksbr }}</dd>{% endif %}
   </dl>
 </div>
 <div class="actions">

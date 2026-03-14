@@ -29,6 +29,7 @@ class Customer:
     name: str
     email: str
     phone: str
+    note: str = ""
 
 
 def _after_commit(func, *args):
@@ -111,6 +112,7 @@ def create_booking(service, start, customer, staff=None, *, source=None, overrid
             customer_name=customer.name,
             customer_email=customer.email,
             customer_phone=customer.phone,
+            customer_note=customer.note,
             source=source,
             status=Booking.Status.PENDING if pending else Booking.Status.CONFIRMED,
             hold_expires_at=(

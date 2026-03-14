@@ -18,6 +18,7 @@
   {% include "includes/field.html" with field=form.name %}
   {% include "includes/field.html" with field=form.email %}
   {% include "includes/field.html" with field=form.phone %}
+  {% include "includes/field.html" with field=form.note %}
   <div class="hp" aria-hidden="true">{% include "includes/field.html" with field=form.website %}</div>
   <div class="actions">
     <button type="submit" class="button button-primary">{% if business.require_confirmation %}Request booking{% else %}Book{% endif %}</button>
