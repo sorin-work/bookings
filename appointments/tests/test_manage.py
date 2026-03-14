@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
 from appointments.models import Booking
 from appointments.tokens import make_token
@@ -98,3 +99,32 @@ def test_cancelled_booking_cannot_be_moved(client, booking):
     booking.refresh_from_db()
     assert booking.start == at(next_weekday(0), 10)
     assert booking.status == Booking.Status.CANCELLED
+
+
+def test_customers_cannot_cancel_inside_the_notice_period(client, service, staff):
+    soon = make_booking(service, staff, timezone.now() + timedelta(hours=5))
+
+    response = client.post(reverse("appointments:manage_cancel", args=[make_token(soon)]))
+
+    assert response.status_code == 302
+    soon.refresh_from_db()
+    assert soon.status == Booking.Status.CONFIRMED
+
+
+def test_customers_cannot_move_inside_the_notice_period(client, service, staff):
+    soon = make_booking(service, staff, timezone.now() + timedelta(hours=5))
+
+    response = client.get(reverse("appointments:manage_reschedule", args=[make_token(soon)]))
+
+    assert response.status_code == 302
+
+
+def test_notice_period_is_set_per_business(client, business, service, staff):
+    business.cancellation_notice_hours = 2
+    business.save()
+    soon = make_booking(service, staff, timezone.now() + timedelta(hours=5))
+
+    client.post(reverse("appointments:manage_cancel", args=[make_token(soon)]))
+
+    soon.refresh_from_db()
+    assert soon.status == Booking.Status.CANCELLED
