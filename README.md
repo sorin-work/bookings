@@ -80,6 +80,19 @@ set `DATABASE_URL` to use another database. Without `EMAIL_HOST`, emails are pri
 the console.
 `make db`, `make run`, `make test` and `make lint` wrap the usual commands.
 
+### Scheduled commands
+
+Two management commands should run every few minutes, from cron or a scheduler of your
+choice:
+
+```bash
+python manage.py send_reminders     # emails customers whose appointment is in the next 24 hours
+python manage.py expire_bookings    # releases bookings that weren't confirmed in time
+```
+
+Both are safe to run as often as you like. With Docker:
+`docker compose exec app python manage.py send_reminders`.
+
 ## Tests
 
 ```bash
