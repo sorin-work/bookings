@@ -267,6 +267,8 @@ class Command(BaseCommand):
             customer_name=name,
             customer_email=email,
             customer_phone=phone,
+            customer_note=rng.choice(NOTES) if rng.random() < 0.08 else "",
+            source=Booking.Source.DASHBOARD if rng.random() < 0.2 else Booking.Source.ONLINE,
             status=status,
             cancelled_at=cancelled_at,
             cancelled_by=cancelled_by,
