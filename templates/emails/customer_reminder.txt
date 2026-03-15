@@ -1,0 +1,11 @@
+{% autoescape off %}Hi {{ booking.customer_name }},
+
+Just a reminder of your appointment at {{ business.name }}.
+
+{% include "emails/_details.txt" %}
+
+Can't make it? Please change or cancel your booking here, so someone else can have the time:
+{{ manage_url }}
+
+{{ business.name }}
+{% endautoescape %}

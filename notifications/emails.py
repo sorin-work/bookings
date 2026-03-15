@@ -22,6 +22,7 @@ CUSTOMER_SUBJECTS = {
     "rescheduled": "Booking moved: {service} is now on {when}",
     "pending": "Please confirm your booking: {service} on {when}",
     "confirmed": "Booking confirmed: {service} on {when}",
+    "reminder": "Reminder: {service} on {when}",
 }
 
 BUSINESS_SUBJECTS = {
@@ -124,3 +125,7 @@ def booking_rescheduled(booking, old_start):
 def booking_confirmed(booking):
     _customer("confirmed", booking, attach_ics=True)
     _business("confirmed", booking)
+
+
+def booking_reminder(booking):
+    _customer("reminder", booking)

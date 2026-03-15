@@ -271,6 +271,9 @@ class Command(BaseCommand):
             cancelled_at=cancelled_at,
             cancelled_by=cancelled_by,
         )
+        sent_reminder = start - created > timedelta(days=1) and start <= now
+        if status != Booking.Status.CANCELLED and sent_reminder:
+            booking.reminder_sent_at = start - timedelta(hours=24)
         booking.created_at = min(created, now)
         return booking
 
