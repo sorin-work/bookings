@@ -4,12 +4,16 @@ from django import forms
 
 from .services import Customer
 
-PHONE_RE = re.compile(r"^\d{7,15}$")
+# Digits with the usual separators people type: +44 7700 900123, (555) 010-0199.
+PHONE_RE = re.compile(r"^\+?[\d\s().-]{7,25}$")
 
 
 def clean_phone_number(value):
     phone = value.strip()
     if not PHONE_RE.match(phone):
+        raise forms.ValidationError("Enter a phone number we can call.")
+    digits = sum(ch.isdigit() for ch in phone)
+    if not 7 <= digits <= 15:
         raise forms.ValidationError("Enter a phone number we can call.")
     return phone
 

@@ -135,6 +135,25 @@ def test_create_booking_checks_the_time_again(service, staff):
         create_booking(service, start, Customer("Bo", "bo@example.com", "07700900456"), staff)
 
 
+@pytest.mark.parametrize("phone", ["+44 7700 900123", "(555) 010-0199", "0049 30 1234567"])
+def test_phone_numbers_with_separators_are_accepted(client, business, service, staff, phone):
+    start = at(next_weekday(0), 10)
+
+    client.post(book_url(business, service, start, staff), customer_data(phone=phone))
+
+    assert Booking.objects.get().customer_phone == phone
+
+
+@pytest.mark.parametrize("phone", ["call me", "12345", "+44 7700 900123 4567 89"])
+def test_bad_phone_numbers_are_rejected(client, business, service, staff, phone):
+    start = at(next_weekday(0), 10)
+
+    response = client.post(book_url(business, service, start, staff), customer_data(phone=phone))
+
+    assert response.status_code == 200
+    assert not Booking.objects.exists()
+
+
 def test_honeypot_stops_bots(client, business, service, staff):
     start = at(next_weekday(0), 10)
 
