@@ -5,6 +5,7 @@ import pytest
 from django.urls import reverse
 
 from appointments.models import Booking
+from businesses.models import Service
 from dashboard import stats
 from testutils import make_booking
 
@@ -56,3 +57,36 @@ def test_cancelled_bookings_bring_no_revenue(business, service, staff):
     totals = stats.period_totals(business, business.today(), business.today())
 
     assert totals == {"count": 2, "revenue": Decimal("35.00")}
+
+
+def test_outcome_rates(business, service, staff):
+    for days in range(1, 9):
+        make_booking(
+            service, staff, today_at(business, 10, days=-days), status=Booking.Status.COMPLETED
+        )
+    make_booking(service, staff, today_at(business, 12, days=-3), status=Booking.Status.CANCELLED)
+    make_booking(service, staff, today_at(business, 14, days=-3), status=Booking.Status.NO_SHOW)
+
+    rates = stats.outcome_rates(business)
+
+    assert rates == {"total": 10, "cancelled": Decimal("10"), "no_show": Decimal("10")}
+
+
+def test_outcome_rates_without_bookings(business):
+    assert stats.outcome_rates(business) == {"total": 0, "cancelled": None, "no_show": None}
+
+
+def test_top_services(business, service, staff):
+    beard = Service.objects.create(
+        business=business, name="Beard trim", duration_minutes=15, price=10
+    )
+    for days in range(3):
+        make_booking(service, staff, today_at(business, 10, days=-days))
+    make_booking(beard, staff, today_at(business, 15, days=-1))
+
+    top = stats.top_services(business)
+
+    assert top == [
+        {"service__name": "Haircut", "count": 3},
+        {"service__name": "Beard trim", "count": 1},
+    ]
