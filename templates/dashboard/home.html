@@ -49,5 +49,17 @@
     <p class="muted">No upcoming bookings yet.</p>
     {% endif %}
   </div>
+  <div class="card">
+    <h2>Most booked, last 90 days</h2>
+    {% if top_services %}
+    <table class="table">
+      <tbody>
+        {% for row in top_services %}<tr><td>{{ row.service__name }}</td><td class="num">{{ row.count }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="muted">No bookings yet.</p>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

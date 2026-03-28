@@ -24,6 +24,7 @@ def home(request):
         "next_bookings": [b for b in upcoming[:50] if b.local_start.date() > today][:8],
         "summary": stats.summary(business),
         "rates": stats.outcome_rates(business),
+        "top_services": stats.top_services(business),
     }
     return render(request, "dashboard/home.html", context)
 

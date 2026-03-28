@@ -64,3 +64,16 @@ def outcome_rates(business, days=30):
         "cancelled": share(Booking.Status.CANCELLED),
         "no_show": share(Booking.Status.NO_SHOW),
     }
+
+
+def top_services(business, days=90, limit=5):
+    today = business.today()
+    qs = Booking.objects.filter(
+        business=business,
+        start__gte=_start_of(today - timedelta(days=days), business.tz),
+    ).exclude(status__in=Booking.CLOSED_STATUSES)
+    return list(
+        qs.values("service__name")
+        .annotate(count=Count("pk"))
+        .order_by("-count", "service__name")[:limit]
+    )
