@@ -11,6 +11,8 @@
   <div class="card stat"><div class="value">{{ summary.week.count }}</div><div class="label">This week</div></div>
   <div class="card stat"><div class="value">{{ summary.week.revenue|money }}</div><div class="label">Revenue this week</div></div>
   <div class="card stat"><div class="value">{{ summary.month.revenue|money }}</div><div class="label">Revenue this month</div></div>
+  <div class="card stat"><div class="value">{% if rates.cancelled is not None %}{{ rates.cancelled }}%{% else %}–{% endif %}</div><div class="label">Cancelled, last 30 days</div></div>
+  <div class="card stat"><div class="value">{% if rates.no_show is not None %}{{ rates.no_show }}%{% else %}–{% endif %}</div><div class="label">No-shows, last 30 days</div></div>
 </div>
 <div class="dashboard-grid">
   <div class="card">

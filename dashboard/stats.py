@@ -1,6 +1,7 @@
 """Numbers for the dashboard. Days and weeks are in the business's time zone."""
 
 from datetime import datetime, time, timedelta
+from decimal import Decimal
 
 from django.db.models import Count, Q, Sum
 
@@ -38,4 +39,28 @@ def summary(business):
         "today": period_totals(business, today, today),
         "week": period_totals(business, monday, monday + timedelta(days=6)),
         "month": period_totals(business, first_of_month, next_month - timedelta(days=1)),
+    }
+
+
+def outcome_rates(business, days=30):
+    """Share of bookings in the last `days` days that were cancelled or no-shows."""
+    tz = business.tz
+    today = business.today()
+    qs = Booking.objects.filter(
+        business=business,
+        start__gte=_start_of(today - timedelta(days=days), tz),
+        start__lt=_start_of(today, tz),
+    ).exclude(status=Booking.Status.EXPIRED)
+    counts = dict(qs.values_list("status").annotate(n=Count("pk")))
+    total = sum(counts.values())
+
+    def share(status):
+        if not total:
+            return None
+        return (Decimal(counts.get(status, 0)) * 100 / total).quantize(Decimal("1"))
+
+    return {
+        "total": total,
+        "cancelled": share(Booking.Status.CANCELLED),
+        "no_show": share(Booking.Status.NO_SHOW),
     }
