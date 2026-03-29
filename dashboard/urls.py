@@ -12,4 +12,5 @@ urlpatterns = [
     path("bookings/<int:pk>/cancel/", views.booking_cancel, name="booking_cancel"),
     path("bookings/", lists.bookings, name="bookings"),
     path("bookings/new/", views.booking_new, name="booking_new"),
+    path("bookings/export.csv", lists.bookings_csv, name="bookings_csv"),
 ]
