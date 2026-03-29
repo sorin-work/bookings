@@ -1,3 +1,5 @@
+import csv
+import io
 from datetime import time
 
 import pytest
@@ -109,3 +111,14 @@ def test_bookings_list_is_paginated(owner_client, service, staff):
 
     assert len(response.context["bookings"]) == 25
     assert response.context["page"].paginator.num_pages == 2
+
+
+def test_csv_export(owner_client, service, staff):
+    make_booking(service, staff, at(next_weekday(0), 10), customer_name='=HYPERLINK("x")')
+
+    response = owner_client.get(reverse("dashboard:bookings_csv"))
+
+    rows = list(csv.reader(io.StringIO(response.content.decode())))
+    assert rows[0][:3] == ["Reference", "Date", "Start"]
+    assert rows[1][2] == "10:00"
+    assert rows[1][6] == "'" + '=HYPERLINK("x")'

@@ -11,6 +11,9 @@ from django.shortcuts import render
 from appointments.models import Booking
 from businesses.decorators import business_required
 
+# Cells starting with these are run as formulas by Excel and friends.
+FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+
 
 def _parse_day(value):
     try:
@@ -73,6 +76,8 @@ def bookings(request):
 
 def _cell(value):
     value = "" if value is None else str(value)
+    if value.startswith(FORMULA_PREFIXES):
+        return "'" + value
     return value
 
 
