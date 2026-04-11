@@ -8,7 +8,7 @@ from django.utils import timezone
 from appointments.models import Booking
 from businesses.models import TimeOff, WorkingHours
 
-from .slots import Interval, ServiceSpec, Shift, StaffSchedule, staff_slots
+from .slots import Interval, ServiceSpec, Shift, StaffSchedule, days_between, staff_slots
 
 
 def bookable_staff(service):
@@ -97,6 +97,17 @@ def start_times(slots):
         if not seen or seen[-1] != slot.start:
             seen.append(slot.start)
     return seen
+
+
+def available_days(service, staff=None, now=None):
+    """{day: has free slots} for every day in the booking window."""
+    business = service.business
+    now = now or timezone.now()
+    first_day, last_day, earliest = booking_window(business, now)
+    return {
+        day: bool(available_slots(service, day, staff=staff, now=now))
+        for day in days_between(first_day, last_day)
+    }
 
 
 def is_available(service, staff, start, now=None):

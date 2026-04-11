@@ -1,8 +1,12 @@
 <div class="slot-picker card">
+  {% if not has_free_days %}
+  <p class="muted">There are no free times in the next few weeks. Please check again later{% if business.phone %} or call {{ business.phone }}{% endif %}.</p>
+  {% else %}
   <div class="date-strip" role="tablist">
     {% for day, free in days %}
     <button type="button" role="tab"
       class="{% if day == selected %}is-selected{% endif %}"
+      {% if not free %}disabled title="No free times"{% endif %}
       hx-get="{{ slots_url }}?date={{ day|date:'Y-m-d' }}{% if staff and not reschedule %}&amp;staff={{ staff.pk }}{% endif %}"
       hx-target="#slots"
       hx-swap="innerHTML"
@@ -14,4 +18,5 @@
   <div id="slots">
     {% include "appointments/includes/slots.html" %}
   </div>
+  {% endif %}
 </div>

@@ -158,6 +158,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .button:focus-v
 .date-strip { display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.25rem; }
 .date-strip button { min-width: 4.2rem; text-align: center; line-height: 1.2; padding: 0.4rem; }
 .date-strip button.is-selected { border-color: var(--accent, var(--primary)); background: var(--accent, var(--primary)); color: #fff; }
+.date-strip button:disabled { opacity: 0.45; cursor: not-allowed; }
 .date-strip .weekday { display: block; font-size: 0.75rem; text-transform: uppercase; }
 .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 0.5rem; }
 .slots a { text-align: center; }

@@ -62,12 +62,16 @@ def _parse_day(value):
 
 def _picker(service, staff, selected=None):
     """Context for the date strip and the times of the selected day."""
-    business = service.business
-    first_day, _, _ = availability.booking_window(business)
-    days = [(first_day + timedelta(days=i), True) for i in range(14)]
+    days = list(availability.available_days(service, staff=staff).items())
+    free_days = [day for day, free in days if free]
     if selected is None or not any(day == selected for day, _ in days):
-        selected = first_day
-    return {"days": days, "selected": selected, **_times(service, staff, selected)}
+        selected = free_days[0] if free_days else days[0][0]
+    return {
+        "days": days,
+        "selected": selected,
+        "has_free_days": bool(free_days),
+        **_times(service, staff, selected),
+    }
 
 
 def _times(service, staff, day):
