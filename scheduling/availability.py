@@ -104,10 +104,13 @@ def available_days(service, staff=None, now=None):
     business = service.business
     now = now or timezone.now()
     first_day, last_day, earliest = booking_window(business, now)
-    return {
-        day: bool(available_slots(service, day, staff=staff, now=now))
-        for day in days_between(first_day, last_day)
-    }
+    members = [staff] if staff else list(bookable_staff(service))
+    # One load for the whole window instead of a round of queries per day.
+    schedules = load_schedules(business, members, first_day, last_day, now=now)
+    days = {}
+    for day in days_between(first_day, last_day):
+        days[day] = bool(_slots(business, service, schedules, day, earliest))
+    return days
 
 
 def is_available(service, staff, start, now=None):

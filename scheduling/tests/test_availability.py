@@ -122,3 +122,16 @@ def test_booking_window_starts_on_the_business_s_local_date(business):
     assert first_day == date(2026, 1, 13)
     assert last_day == date(2026, 1, 13) + timedelta(days=business.max_advance_days)
     assert earliest == now
+
+
+def test_available_days_matches_the_slots_of_each_day(
+    service, staff, django_assert_max_num_queries
+):
+    monday = next_weekday(0)
+    make_booking(service, staff, at(monday, 9))
+
+    with django_assert_max_num_queries(8):
+        days = availability.available_days(service)
+
+    for day in list(days)[:10]:
+        assert days[day] == bool(availability.available_slots(service, day))
