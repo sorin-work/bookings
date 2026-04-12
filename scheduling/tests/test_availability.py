@@ -112,6 +112,15 @@ def test_inactive_staff_are_not_offered(service, staff):
     assert availability.available_slots(service, next_weekday(0)) == []
 
 
+def test_time_off_that_started_before_the_day_still_blocks_it(service, staff):
+    monday = next_weekday(0)
+    TimeOff.objects.create(
+        staff=staff, start=at(monday - timedelta(days=10), 0), end=at(monday + timedelta(days=4), 0)
+    )
+
+    assert availability.available_slots(service, monday) == []
+
+
 def test_booking_window_starts_on_the_business_s_local_date(business):
     business.timezone = "Pacific/Auckland"
     business.min_notice_minutes = 0

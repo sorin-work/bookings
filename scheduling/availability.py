@@ -54,7 +54,7 @@ def load_schedules(business, staff_members, first_day, last_day, *, now=None):
     for booking in bookings.only(*fields):
         busy[booking.staff_id].append(Interval(booking.busy_start, booking.busy_end))
     time_off = TimeOff.objects.filter(
-        staff_id__in=staff_ids, start__gte=range_start, start__lt=range_end
+        staff_id__in=staff_ids, start__lt=range_end, end__gt=range_start
     )
     for item in time_off:
         busy[item.staff_id].append(Interval(item.start, item.end))
