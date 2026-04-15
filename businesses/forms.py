@@ -161,6 +161,16 @@ class WeeklyHoursForm(forms.Form):
         )
 
 
+def copy_day(data, from_weekday, to_weekdays):
+    """Copy one weekday's times to other days in submitted form data."""
+    data = data.copy()
+    for weekday in to_weekdays:
+        for shift in range(1, SHIFTS_PER_DAY + 1):
+            for part in ("start", "end"):
+                data[f"d{weekday}_{shift}_{part}"] = data.get(f"d{from_weekday}_{shift}_{part}", "")
+    return data
+
+
 class TimeOffForm(forms.Form):
     start_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
     start_time = forms.TimeField(

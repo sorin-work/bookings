@@ -13,6 +13,7 @@ from .forms import (
     StaffForm,
     TimeOffForm,
     WeeklyHoursForm,
+    copy_day,
 )
 from .models import Business
 from .utils import unique_slug
@@ -137,6 +138,12 @@ def staff_form(request, pk=None):
 @business_required
 def staff_hours(request, pk):
     member = get_object_or_404(request.business.staff, pk=pk)
+    if request.method == "POST" and "copy" in request.POST:
+        # Fill in the form again with Monday's times copied; nothing is saved yet.
+        data = copy_day(request.POST, 0, range(1, 5))
+        form = WeeklyHoursForm(data, staff=member)
+        form.errors.clear()
+        return render(request, "businesses/staff_hours.html", {"form": form, "member": member})
     form = WeeklyHoursForm(request.POST or None, staff=member)
     if request.method == "POST" and form.is_valid():
         form.save()
