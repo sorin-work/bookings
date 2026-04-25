@@ -37,6 +37,16 @@ def test_sign_up_creates_the_business(client):
     assert business.timezone == "Europe/Berlin"
 
 
+def test_sign_up_with_a_business_name_that_is_taken_gets_its_own_slug(client):
+    client.post(reverse("accounts:signup"), signup_data())
+    client.logout()
+
+    response = client.post(reverse("accounts:signup"), signup_data(email="other@example.com"))
+
+    assert response.status_code == 302
+    assert Business.objects.get(owner__email="other@example.com").slug == "studio-one-2"
+
+
 def test_sign_up_rejects_an_email_that_is_taken(client, user):
     response = client.post(reverse("accounts:signup"), signup_data(email="OWNER@example.com"))
 
