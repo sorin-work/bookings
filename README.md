@@ -103,3 +103,18 @@ ruff check .
 pytest-django creates and drops a `test_bookings` database next to the real one.
 CI (`.github/workflows/ci.yml`) runs the linter and the tests against Postgres and builds
 the Docker image.
+
+## Deploying
+
+The Docker image is meant to run behind a reverse proxy (Caddy, nginx, a platform's
+load balancer) that terminates https. On the app container set:
+
+- `SECRET_KEY` to a long random value, and keep it: changing it breaks every booking
+  link already sent to customers.
+- `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS` and `SITE_URL` to the public address.
+- `SECURE_COOKIES=true`, `BEHIND_PROXY=true` and, once everything works over https,
+  `SECURE_HSTS_SECONDS=31536000`.
+- `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`,
+  `EMAIL_USE_TLS` and `DEFAULT_FROM_EMAIL` for a real mail provider.
+
+Migrations run on every start. Remember the two scheduled commands below.
