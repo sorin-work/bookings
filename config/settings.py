@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,6 +22,16 @@ def env_bool(name, default=False):
 
 def env_list(name, default=""):
     return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
+
+
+def env_int(name, default):
+    value = os.environ.get(name, "").strip()
+    if not value:
+        return default
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise ImproperlyConfigured(f"{name} must be a whole number, got {value!r}") from exc
 
 
 DEBUG = env_bool("DEBUG")
@@ -111,7 +122,7 @@ STORAGES = {
 
 # Email. Without EMAIL_HOST, messages are printed to the console.
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "25"))
+EMAIL_PORT = env_int("EMAIL_PORT", 25)
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS")
@@ -128,6 +139,20 @@ SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000").rstrip("/")
 
 # How long an unconfirmed booking keeps its slot while the customer confirms by email.
 BOOKING_CONFIRMATION_HOLD_MINUTES = 30
+
+# Security. Set SECURE_COOKIES=true once the app is served over https.
+SESSION_COOKIE_SECURE = env_bool("SECURE_COOKIES")
+CSRF_COOKIE_SECURE = SESSION_COOKIE_SECURE
+SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT")
+SECURE_HSTS_SECONDS = env_int("SECURE_HSTS_SECONDS", 0)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"
+if env_bool("BEHIND_PROXY"):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = True
+if not DEBUG and SECRET_KEY.startswith("insecure-") and env_bool("SECURE_COOKIES"):
+    raise ImproperlyConfigured("Set SECRET_KEY to a long random value before serving over https.")
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 LOGGING = {
