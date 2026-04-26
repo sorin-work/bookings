@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Page not found{% endblock %}
+{% block content %}
+<div class="auth" style="text-align: center">
+  <h1>We couldn't find that page</h1>
+  <p class="muted">The link may be old, or the page has moved.{% if exception %} {{ exception }}{% endif %}</p>
+  <p><a class="button" href="/">Go to the start page</a></p>
+</div>
+{% endblock %}
