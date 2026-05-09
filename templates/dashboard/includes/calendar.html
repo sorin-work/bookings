@@ -30,6 +30,7 @@
     <div class="calendar-hours">{% for hour in grid.hours %}<div>{{ hour|stringformat:"02d" }}:00</div>{% endfor %}</div>
     {% for column in grid.columns %}
     <div class="calendar-column">
+      {% for hour in grid.hours %}<a class="calendar-hour-link" style="top: calc(var(--hour-height) * {{ forloop.counter0 }})" href="{% url 'dashboard:booking_new' %}?date={{ column.day|date:'Y-m-d' }}&amp;time={{ hour|stringformat:'02d' }}:00{% if column.staff %}&amp;staff={{ column.staff.pk }}{% elif selected_staff %}&amp;staff={{ selected_staff.pk }}{% endif %}" title="Add a booking at {{ hour|stringformat:'02d' }}:00" aria-label="Add a booking at {{ hour|stringformat:'02d' }}:00"></a>{% endfor %}
       {% for block in column.blocks %}<div class="calendar-off" style="top: {{ block.top }}%; height: {{ block.height }}%">{{ block.label }}</div>{% endfor %}
       {% for event in column.events %}
       <a class="calendar-event{% if event.booking.status == 'cancelled' %} is-cancelled{% endif %}"

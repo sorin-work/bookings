@@ -118,6 +118,10 @@ def booking_cancel(request, pk):
 def booking_new(request):
     business = request.business
     initial = {}
+    # The calendar links here with ?staff=&date=&time= filled in.
+    for key in ("staff", "date", "time", "service"):
+        if request.GET.get(key):
+            initial[key] = request.GET[key]
     form = ManualBookingForm(request.POST or None, business=business, initial=initial)
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data
