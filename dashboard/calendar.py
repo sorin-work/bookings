@@ -70,6 +70,14 @@ def _visible_hours(staff, days, bookings, tz):
     else:
         start = min(row.start_time.hour for row in rows)
         end = max(row.end_time.hour + (1 if row.end_time.minute else 0) for row in rows)
+    # Bookings made outside working hours (from the dashboard) still have to show.
+    for booking in bookings:
+        local_start, local_end = booking.start.astimezone(tz), booking.end.astimezone(tz)
+        start = min(start, local_start.hour)
+        if local_end.date() > local_start.date():
+            end = 24
+        else:
+            end = max(end, local_end.hour + (1 if local_end.minute else 0))
     return start, max(end, start + 1)
 
 

@@ -154,3 +154,14 @@ def test_time_off_shows_in_the_grid(business, staff):
     [block] = grid.columns[0].blocks
     assert block.label == "Dentist"
     assert block.top == pytest.approx(50)
+
+
+def test_grid_stretches_to_show_bookings_outside_working_hours(business, service, staff):
+    monday = next_weekday(0)
+    make_booking(service, staff, at(monday, 7, 30))
+    make_booking(service, staff, at(monday, 18, 0))
+
+    grid = calendar.day_grid(business, monday, [staff])
+
+    assert (grid.start_hour, grid.end_hour) == (7, 19)
+    assert len(grid.columns[0].events) == 2
