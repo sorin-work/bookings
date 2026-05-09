@@ -10,6 +10,7 @@ urlpatterns = [
     path("bookings/<int:pk>/", views.booking_detail, name="booking"),
     path("bookings/<int:pk>/outcome/", views.booking_outcome, name="booking_outcome"),
     path("bookings/<int:pk>/cancel/", views.booking_cancel, name="booking_cancel"),
+    path("bookings/<int:pk>/note/", views.booking_note, name="booking_note"),
     path("bookings/", lists.bookings, name="bookings"),
     path("bookings/new/", views.booking_new, name="booking_new"),
     path("bookings/export.csv", lists.bookings_csv, name="bookings_csv"),

@@ -24,3 +24,9 @@
   <button class="button-small button-danger" hx-post="{% url 'dashboard:booking_cancel' booking.pk %}" hx-target="#panel" hx-confirm="Cancel this booking? {{ booking.customer_name }} will get an email.">Cancel booking</button>
   {% endif %}
 </div>
+<form method="post" action="{% url 'dashboard:booking_note' booking.pk %}" hx-post="{% url 'dashboard:booking_note' booking.pk %}" hx-target="#panel" style="margin-top: 1rem">
+  {% csrf_token %}
+  <label for="internal-note-{{ booking.pk }}">Private note</label>
+  <textarea id="internal-note-{{ booking.pk }}" name="internal_note" rows="3" placeholder="Only you and your staff can see this">{{ booking.internal_note }}</textarea>
+  <div class="actions"><button type="submit" class="button-small">Save note</button></div>
+</form>

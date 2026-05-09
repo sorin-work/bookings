@@ -122,3 +122,14 @@ def test_csv_export(owner_client, service, staff):
     assert rows[0][:3] == ["Reference", "Date", "Start"]
     assert rows[1][2] == "10:00"
     assert rows[1][6] == "'" + '=HYPERLINK("x")'
+
+
+def test_private_note(owner_client, service, staff):
+    booking = make_booking(service, staff, at(next_weekday(0), 10))
+
+    owner_client.post(
+        reverse("dashboard:booking_note", args=[booking.pk]), {"internal_note": "Prefers Kit"}
+    )
+
+    booking.refresh_from_db()
+    assert booking.internal_note == "Prefers Kit"

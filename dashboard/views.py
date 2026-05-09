@@ -115,6 +115,16 @@ def booking_cancel(request, pk):
 
 
 @business_required
+@require_POST
+def booking_note(request, pk):
+    booking = _booking(request, pk)
+    booking.internal_note = request.POST.get("internal_note", "").strip()[:2000]
+    booking.save(update_fields=["internal_note", "updated_at"])
+    messages.success(request, "Note saved.")
+    return _after_action(request, booking)
+
+
+@business_required
 def booking_new(request):
     business = request.business
     initial = {}
