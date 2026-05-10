@@ -25,6 +25,9 @@
     {% if booking.customer_note %}<dt>Your note</dt><dd>{{ booking.customer_note|linebreaksbr }}</dd>{% endif %}
     {% if business.address %}<dt>Where</dt><dd>{{ business.address }}</dd>{% endif %}
   </dl>
+  {% if booking.is_open %}
+  <p class="small"><a href="{% url 'appointments:manage_ics' token %}">Add to my calendar (.ics)</a></p>
+  {% endif %}
   <div class="actions">
     {% if booking.status == "pending" %}
     <form method="post" action="{% url 'appointments:manage_confirm' token %}">

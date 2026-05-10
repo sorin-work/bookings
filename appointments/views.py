@@ -3,7 +3,7 @@
 from datetime import date, datetime, timedelta
 
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -14,6 +14,7 @@ from scheduling import availability
 
 from . import services
 from .forms import CustomerForm
+from .ics import booking_ics
 from .models import Booking
 from .tokens import booking_for_token
 
@@ -264,3 +265,10 @@ def manage_confirm(request, token):
         return redirect(booking.manage_url)
     messages.success(request, "Thanks, your booking is confirmed.")
     return redirect(booking.manage_url)
+
+
+def manage_ics(request, token):
+    booking = _booking(token)
+    response = HttpResponse(booking_ics(booking), content_type="text/calendar; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="booking-{booking.reference}.ics"'
+    return response

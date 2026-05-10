@@ -18,4 +18,5 @@ urlpatterns = [
         name="manage_reschedule_slots",
     ),
     path("m/<str:token>/confirm/", views.manage_confirm, name="manage_confirm"),
+    path("m/<str:token>/booking.ics", views.manage_ics, name="manage_ics"),
 ]
