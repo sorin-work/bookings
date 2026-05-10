@@ -128,3 +128,14 @@ def test_notice_period_is_set_per_business(client, business, service, staff):
 
     soon.refresh_from_db()
     assert soon.status == Booking.Status.CANCELLED
+
+
+def test_calendar_download(client, booking):
+    response = client.get(reverse("appointments:manage_ics", args=[make_token(booking)]))
+
+    body = response.content.decode()
+    assert response.status_code == 200
+    assert response["Content-Type"].startswith("text/calendar")
+    assert "BEGIN:VEVENT" in body
+    assert f"UID:{booking.public_id}@bookings" in body
+    assert "SUMMARY:Haircut at Fern & Co" in body
