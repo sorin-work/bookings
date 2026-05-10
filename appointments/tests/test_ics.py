@@ -26,3 +26,22 @@ def test_cancelled_bookings_are_marked_cancelled(service, staff):
     booking = make_booking(service, staff, at(next_weekday(0), 10), status="cancelled")
 
     assert "STATUS:CANCELLED" in ics.event_lines(booking)
+
+
+def test_long_lines_are_folded(business, service, staff):
+    business.address = "Unit 4, The Old Tannery, 112 Long Lane Industrial Estate, Little Hampton"
+    booking = make_booking(service, staff, at(next_weekday(0), 10))
+
+    body = ics.booking_ics(booking)
+
+    assert all(len(line.encode()) <= 75 for line in body.split("\r\n"))
+    assert "LOCATION:Unit 4\\, The Old Tannery" in body.replace("\r\n ", "")
+
+
+def test_folding_keeps_multibyte_characters_whole():
+    line = "SUMMARY:" + "é" * 60
+
+    folded = ics._fold(line)
+
+    assert folded.replace("\r\n ", "") == line
+    assert all(len(part.encode()) <= 75 for part in folded.split("\r\n"))

@@ -22,6 +22,23 @@ def _stamp(value):
     return value.astimezone(UTC).strftime("%Y%m%dT%H%M%SZ")
 
 
+def _fold(line):
+    """Lines longer than 75 octets are folded with CRLF + space."""
+    encoded = line.encode()
+    if len(encoded) <= 75:
+        return line
+    parts = []
+    while len(encoded) > 75:
+        cut = 75 if not parts else 74
+        # Don't split a multi-byte character.
+        while cut > 0 and (encoded[cut] & 0xC0) == 0x80:
+            cut -= 1
+        parts.append(encoded[:cut].decode())
+        encoded = encoded[cut:]
+    parts.append(encoded.decode())
+    return "\r\n ".join(parts)
+
+
 def event_lines(booking, *, include_customer=False):
     business = booking.business
     summary = f"{booking.service.name} at {business.name}"
@@ -62,7 +79,7 @@ def calendar(events, *, method="PUBLISH", name=None):
     for event in events:
         lines.extend(event)
     lines.append("END:VCALENDAR")
-    return "\r\n".join(lines) + "\r\n"
+    return "\r\n".join(_fold(line) for line in lines) + "\r\n"
 
 
 def booking_ics(booking):
