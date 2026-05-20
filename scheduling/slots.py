@@ -8,6 +8,7 @@ Python compares two datetimes that share a tzinfo by wall-clock time, which is
 wrong across a daylight saving change.
 """
 
+import bisect
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, time, timedelta
 
@@ -45,12 +46,35 @@ class StaffSchedule:
     shifts: list[Shift]
     busy: list[Interval] = field(default_factory=list)
 
+    def __post_init__(self):
+        self.busy = merge(self.busy)
+        self._starts = [interval.start for interval in self.busy]
+
+    def is_free(self, interval):
+        """True when `interval` doesn't overlap anything in `busy`."""
+        # Busy periods are merged and sorted, so only the last one starting before
+        # `interval` ends can overlap it.
+        index = bisect.bisect_left(self._starts, interval.end) - 1
+        return index < 0 or not self.busy[index].overlaps(interval)
+
 
 @dataclass(frozen=True)
 class Slot:
     start: datetime
     end: datetime
     staff_id: int
+
+
+def merge(intervals):
+    """Sort intervals and join the ones that overlap or touch."""
+    merged = []
+    for interval in sorted(intervals, key=lambda i: i.start):
+        if merged and interval.start <= merged[-1].end:
+            if interval.end > merged[-1].end:
+                merged[-1] = Interval(merged[-1].start, interval.end)
+        else:
+            merged.append(interval)
+    return merged
 
 
 def staff_slots(schedule, service, day, tz, *, interval, earliest=None):
@@ -73,7 +97,7 @@ def staff_slots(schedule, service, day, tz, *, interval, earliest=None):
                 break
             # The buffers have to be free as well, but may run outside working hours.
             occupied = Interval(start - service.buffer_before, end + service.buffer_after)
-            free = not any(occupied.overlaps(busy) for busy in schedule.busy)
+            free = schedule.is_free(occupied)
             if (earliest is None or start >= earliest) and free:
                 slots.append(Slot(start, end, schedule.staff_id))
             start += interval

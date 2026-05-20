@@ -1,7 +1,7 @@
 from datetime import date, time, timedelta
 from zoneinfo import ZoneInfo
 
-from scheduling.slots import Interval, ServiceSpec, Shift, StaffSchedule, staff_slots
+from scheduling.slots import Interval, ServiceSpec, Shift, StaffSchedule, merge, staff_slots
 from testutils import LONDON, at
 
 MONDAY = date(2026, 1, 12)
@@ -193,3 +193,31 @@ def test_slot_may_end_exactly_at_closing_time():
     )
 
     assert starts(slots) == ["09:00", "09:30", "10:00", "10:30", "11:00"]
+
+
+def test_merge_joins_overlapping_and_touching_periods():
+    periods = [
+        Interval(at(MONDAY, 14), at(MONDAY, 15)),
+        Interval(at(MONDAY, 9), at(MONDAY, 10)),
+        Interval(at(MONDAY, 10), at(MONDAY, 11)),
+        Interval(at(MONDAY, 10, 30), at(MONDAY, 10, 45)),
+    ]
+
+    assert merge(periods) == [
+        Interval(at(MONDAY, 9), at(MONDAY, 11)),
+        Interval(at(MONDAY, 14), at(MONDAY, 15)),
+    ]
+
+
+def test_many_busy_periods_are_checked_correctly():
+    busy = [Interval(at(MONDAY, 9, m), at(MONDAY, 9, m + 5)) for m in range(0, 60, 10)]
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(11)), busy=busy),
+        ServiceSpec(timedelta(minutes=5)),
+        MONDAY,
+        LONDON,
+        interval=timedelta(minutes=5),
+    )
+
+    assert starts(slots)[:3] == ["09:05", "09:15", "09:25"]
+    assert "10:00" in starts(slots)
