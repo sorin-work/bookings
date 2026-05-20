@@ -185,3 +185,11 @@ def test_slots_for_a_business_west_of_utc_after_the_clocks_go_back():
     )
 
     assert slots[0].start.isoformat() == "2026-11-02T14:00:00+00:00"
+
+
+def test_slot_may_end_exactly_at_closing_time():
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(12))), ServiceSpec(HOUR), MONDAY, LONDON, interval=HALF_HOUR
+    )
+
+    assert starts(slots) == ["09:00", "09:30", "10:00", "10:30", "11:00"]

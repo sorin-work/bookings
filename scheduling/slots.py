@@ -69,7 +69,7 @@ def staff_slots(schedule, service, day, tz, *, interval, earliest=None):
         start = window_start
         while True:
             end = start + service.duration
-            if end >= window_end:
+            if end > window_end:
                 break
             # The buffers have to be free as well, but may run outside working hours.
             occupied = Interval(start - service.buffer_before, end + service.buffer_after)
