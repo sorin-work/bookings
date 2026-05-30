@@ -4,7 +4,7 @@ import pytest
 from django.utils import timezone
 
 from appointments.models import Booking
-from businesses.models import StaffMember, TimeOff, WorkingHours
+from businesses.models import ClosedDay, StaffMember, TimeOff, WorkingHours
 from scheduling import availability
 from testutils import LONDON, at, make_booking, next_weekday
 
@@ -131,6 +131,15 @@ def test_booking_window_starts_on_the_business_s_local_date(business):
     assert first_day == date(2026, 1, 13)
     assert last_day == date(2026, 1, 13) + timedelta(days=business.max_advance_days)
     assert earliest == now
+
+
+def test_no_slots_on_closed_days(business, service, staff):
+    monday = next_weekday(0)
+    ClosedDay.objects.create(business=business, date=monday, reason="Bank holiday")
+
+    assert availability.available_slots(service, monday) == []
+    assert availability.available_days(service)[monday] is False
+    assert availability.available_days(service)[monday + timedelta(days=1)] is True
 
 
 def test_available_days_matches_the_slots_of_each_day(
