@@ -1,0 +1,37 @@
+{% extends "app.html" %}
+{% block title %}Closed days · {{ business.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Closed days</h1>
+  <a href="{% url 'businesses:settings' %}">Back to settings</a>
+</div>
+<p class="muted">Bank holidays and other days the whole business is shut. Nobody can book on these days. Bookings you already have are not cancelled.</p>
+<div class="dashboard-grid">
+  <div>
+    {% if days %}
+    <table class="table">
+      <tbody>
+        {% for day in days %}
+        <tr>
+          <td>{{ day.date|date:"l j F Y" }}</td>
+          <td>{{ day.reason|default:"–" }}</td>
+          <td class="num">
+            <form method="post" action="{% url 'businesses:closed_day_delete' day.pk %}">{% csrf_token %}<button class="button-small">Remove</button></form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="card empty">No closed days coming up.</div>
+    {% endif %}
+  </div>
+  <form method="post" class="card form" novalidate>
+    {% csrf_token %}
+    <h2>Add a closed day</h2>
+    {% include "includes/field.html" with field=form.date %}
+    {% include "includes/field.html" with field=form.reason %}
+    <div class="actions"><button type="submit" class="button button-primary">Add</button></div>
+  </form>
+</div>
+{% endblock %}

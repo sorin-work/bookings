@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Business, Service, StaffMember, TimeOff, WorkingHours
+from .models import Business, ClosedDay, Service, StaffMember, TimeOff, WorkingHours
 
 
 class ServiceInline(admin.TabularInline):
@@ -33,3 +33,9 @@ class StaffMemberAdmin(admin.ModelAdmin):
 class TimeOffAdmin(admin.ModelAdmin):
     list_display = ["staff", "start", "end", "reason"]
     list_filter = ["staff__business"]
+
+
+@admin.register(ClosedDay)
+class ClosedDayAdmin(admin.ModelAdmin):
+    list_display = ["business", "date", "reason"]
+    list_filter = ["business"]

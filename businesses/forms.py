@@ -2,7 +2,7 @@ from datetime import datetime, time, timedelta
 
 from django import forms
 
-from .models import Business, Service, StaffMember, TimeOff, WorkingHours
+from .models import Business, ClosedDay, Service, StaffMember, TimeOff, WorkingHours
 from .timezones import timezone_choices
 
 
@@ -211,3 +211,24 @@ class TimeOffForm(forms.Form):
             end=self.cleaned_data["end"],
             reason=self.cleaned_data["reason"],
         )
+
+
+class ClosedDayForm(forms.ModelForm):
+    class Meta:
+        model = ClosedDay
+        fields = ["date", "reason"]
+        widgets = {"date": forms.DateInput(attrs={"type": "date"})}
+
+    def __init__(self, *args, business, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.business = business
+
+    def clean_date(self):
+        date = self.cleaned_data["date"]
+        if self.business.closed_days.filter(date=date).exists():
+            raise forms.ValidationError("That day is already marked as closed.")
+        return date
+
+    def save(self, commit=True):
+        self.instance.business = self.business
+        return super().save(commit)

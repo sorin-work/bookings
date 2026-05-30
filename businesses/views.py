@@ -9,6 +9,7 @@ from .decorators import business_required
 from .forms import (
     BusinessForm,
     BusinessSetupForm,
+    ClosedDayForm,
     ServiceForm,
     StaffForm,
     TimeOffForm,
@@ -175,3 +176,23 @@ def staff_time_off_delete(request, pk, time_off_pk):
     get_object_or_404(member.time_off, pk=time_off_pk).delete()
     messages.success(request, "Time off removed.")
     return redirect("businesses:staff_time_off", pk=member.pk)
+
+
+@business_required
+def closed_days(request):
+    business = request.business
+    form = ClosedDayForm(request.POST or None, business=business)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Closed day added. No one can book on that day.")
+        return redirect("businesses:closed_days")
+    days = business.closed_days.filter(date__gte=business.today())
+    return render(request, "businesses/closed_days.html", {"form": form, "days": days})
+
+
+@business_required
+@require_POST
+def closed_day_delete(request, pk):
+    get_object_or_404(request.business.closed_days, pk=pk).delete()
+    messages.success(request, "Closed day removed.")
+    return redirect("businesses:closed_days")

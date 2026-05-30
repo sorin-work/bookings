@@ -192,3 +192,20 @@ class TimeOff(models.Model):
 
     def __str__(self):
         return f"{self.staff}: {self.start:%Y-%m-%d %H:%M} – {self.end:%Y-%m-%d %H:%M}"
+
+
+class ClosedDay(models.Model):
+    """A day the whole business is shut, like a bank holiday."""
+
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name="closed_days")
+    date = models.DateField()
+    reason = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        ordering = ["date"]
+        constraints = [
+            models.UniqueConstraint(fields=["business", "date"], name="closed_day_unique_date")
+        ]
+
+    def __str__(self):
+        return f"{self.business}: closed {self.date:%Y-%m-%d}"
