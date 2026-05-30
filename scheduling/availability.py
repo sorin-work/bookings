@@ -74,6 +74,8 @@ def available_slots(service, day, staff=None, now=None):
     business = service.business
     now = now or timezone.now()
     first_day, last_day, earliest = booking_window(business, now)
+    if business.closed_days.filter(date=day).exists():
+        return []
     members = [staff] if staff else list(bookable_staff(service))
     schedules = load_schedules(business, members, day, day, now=now)
     return _slots(business, service, schedules, day, earliest)
@@ -107,8 +109,13 @@ def available_days(service, staff=None, now=None):
     members = [staff] if staff else list(bookable_staff(service))
     # One load for the whole window instead of a round of queries per day.
     schedules = load_schedules(business, members, first_day, last_day, now=now)
+    closed_days = business.closed_days.filter(date__range=(first_day, last_day))
+    closed = set(closed_days.values_list("date", flat=True))
     days = {}
     for day in days_between(first_day, last_day):
+        if day in closed:
+            days[day] = False
+            continue
         days[day] = bool(_slots(business, service, schedules, day, earliest))
     return days
 
