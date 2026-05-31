@@ -15,7 +15,7 @@ from django.utils import timezone
 
 from accounts.models import User
 from appointments.models import REFERENCE_ALPHABET, Booking
-from businesses.models import Business, Service, StaffMember, TimeOff, WorkingHours
+from businesses.models import Business, ClosedDay, Service, StaffMember, TimeOff, WorkingHours
 
 DEMO_EMAIL = "demo@example.com"
 DEMO_PASSWORD = "demo-password"
@@ -100,6 +100,7 @@ class Command(BaseCommand):
             services = self._services(business)
             staff = self._staff(business, services)
             self._time_off(business, staff)
+            self._closed_days(business)
             count = self._bookings(business, services, staff, rng)
         self.stdout.write(
             self.style.SUCCESS(f"Created {DEMO_EMAIL} / {DEMO_PASSWORD} with {count} bookings.")
@@ -187,6 +188,15 @@ class Command(BaseCommand):
             reason="Colour training",
         )
 
+    def _closed_days(self, business):
+        today = business.today()
+        holidays = [(12, 25, "Christmas Day"), (12, 26, "Boxing Day"), (1, 1, "New Year's Day")]
+        for month, day, reason in holidays:
+            for year in (today.year - 1, today.year, today.year + 1):
+                closed_on = datetime(year, month, day).date()
+                if today - timedelta(days=120) <= closed_on <= today + timedelta(days=60):
+                    ClosedDay.objects.create(business=business, date=closed_on, reason=reason)
+
     def _bookings(self, business, services, staff, rng):
         tz = business.tz
         now = timezone.now()
@@ -194,7 +204,7 @@ class Command(BaseCommand):
         customers = self._customers(rng)
         regulars = customers[:25]
         away = {member.pk: [(t.start, t.end) for t in member.time_off.all()] for member in staff}
-        closed = set()
+        closed = set(business.closed_days.values_list("date", flat=True))
         bookings = []
         for offset in range(-120, 31):
             day = today + timedelta(days=offset)
