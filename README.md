@@ -29,6 +29,30 @@ manage their booking from a signed link in the confirmation email.
 Python 3.12, Django 5.2, PostgreSQL, server-rendered templates with htmx, gunicorn and
 whitenoise. Tests use pytest and pytest-django; ruff for linting.
 
+## How free times are worked out
+
+For a service on a given day, each staff member who offers it gets a list of candidate
+start times: every *slot interval* (15 minutes by default) from the start of each of
+their shifts, as long as the appointment ends by the end of the shift. A candidate is
+kept when:
+
+1. it starts after now plus the business's minimum notice, and the day is within the
+   booking window (`max_advance_days`);
+2. the appointment *and its buffers* don't overlap another booking (with that
+   booking's buffers) or time off. Buffers may run outside working hours, so a 10
+   minute clean-up after the last appointment of the day is fine;
+3. the business isn't closed that day.
+
+Touching periods don't overlap: one appointment can end at 10:00 and the next start at
+10:00. Shifts are local wall-clock times, so 09:00 stays 09:00 after the clocks change;
+all comparisons happen in UTC.
+
+Cancelled and expired bookings don't block anything. A booking waiting for email
+confirmation holds its time for 30 minutes. With "anyone available", the booking goes
+to the free staff member with the fewest bookings that day. Creating, moving and
+confirming a booking lock the staff rows and check again inside the transaction, so
+two customers can't take the same time.
+
 ## Running with Docker
 
 ```bash
