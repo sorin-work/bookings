@@ -25,6 +25,9 @@ def home(request):
         "summary": stats.summary(business),
         "rates": stats.outcome_rates(business),
         "top_services": stats.top_services(business),
+        "booking_page_url": request.build_absolute_uri(
+            reverse("appointments:business", args=[business.slug])
+        ),
     }
     return render(request, "dashboard/home.html", context)
 

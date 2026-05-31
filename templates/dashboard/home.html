@@ -6,6 +6,11 @@
   <h1>{{ business.name }}</h1>
   <a class="button button-primary" href="{% url 'dashboard:booking_new' %}">Add booking</a>
 </div>
+<div class="card" style="margin-bottom: 1.5rem; display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap">
+  <span class="muted">Your booking page</span>
+  <a href="{{ booking_page_url }}" target="_blank" rel="noopener">{{ booking_page_url }}</a>
+  <button type="button" class="button-small" data-copy="{{ booking_page_url }}">Copy link</button>
+</div>
 <div class="stats">
   <div class="card stat"><div class="value">{{ summary.today.count }}</div><div class="label">Bookings today</div></div>
   <div class="card stat"><div class="value">{{ summary.week.count }}</div><div class="label">This week</div></div>
