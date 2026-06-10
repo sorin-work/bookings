@@ -124,6 +124,19 @@ def test_csv_export(owner_client, service, staff):
     assert rows[1][6] == "'" + '=HYPERLINK("x")'
 
 
+def test_cancelling_twice_sends_one_email(
+    owner_client, service, staff, django_capture_on_commit_callbacks
+):
+    booking = make_booking(service, staff, at(next_weekday(0), 10))
+    url = reverse("dashboard:booking_cancel", args=[booking.pk])
+
+    with django_capture_on_commit_callbacks(execute=True):
+        owner_client.post(url)
+        owner_client.post(url)
+
+    assert len(mail.outbox) == 1
+
+
 def test_private_note(owner_client, service, staff):
     booking = make_booking(service, staff, at(next_weekday(0), 10))
 

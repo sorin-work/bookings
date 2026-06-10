@@ -111,8 +111,7 @@ def booking_outcome(request, pk):
 @require_POST
 def booking_cancel(request, pk):
     booking = _booking(request, pk)
-    if booking.is_open:
-        services.cancel_booking(booking, Booking.CancelledBy.BUSINESS)
+    if services.cancel_booking(booking, Booking.CancelledBy.BUSINESS):
         messages.success(request, "Booking cancelled. The customer has been emailed.")
     return _after_action(request, booking)
 

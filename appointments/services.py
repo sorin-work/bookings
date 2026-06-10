@@ -126,12 +126,18 @@ def create_booking(service, start, customer, staff=None, *, source=None, overrid
 
 
 def cancel_booking(booking, by, *, now=None):
-    booking.status = Booking.Status.CANCELLED
-    booking.cancelled_at = now or timezone.now()
-    booking.cancelled_by = by
-    booking.save(update_fields=["status", "cancelled_at", "cancelled_by", "updated_at"])
-    _after_commit(emails.booking_cancelled, booking)
-    return booking
+    """Cancel an open booking. Returns False if it was already closed."""
+    with transaction.atomic():
+        # Re-read under a lock: two clicks on "cancel" must only send one email.
+        current = Booking.objects.select_for_update().get(pk=booking.pk)
+        if not current.is_open:
+            return False
+        booking.status = Booking.Status.CANCELLED
+        booking.cancelled_at = now or timezone.now()
+        booking.cancelled_by = by
+        booking.save(update_fields=["status", "cancelled_at", "cancelled_by", "updated_at"])
+        _after_commit(emails.booking_cancelled, booking)
+    return True
 
 
 def reschedule_booking(booking, start, *, now=None):

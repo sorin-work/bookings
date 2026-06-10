@@ -194,8 +194,7 @@ def manage_cancel(request, token):
             f"Please contact {booking.business.name}.",
         )
         return redirect(booking.manage_url)
-    if booking.is_open:
-        services.cancel_booking(booking, Booking.CancelledBy.CUSTOMER)
+    if services.cancel_booking(booking, Booking.CancelledBy.CUSTOMER):
         messages.success(request, "Your booking is cancelled.")
     return redirect(booking.manage_url)
 
