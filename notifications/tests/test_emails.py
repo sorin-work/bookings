@@ -119,3 +119,20 @@ def test_line_breaks_in_a_name_do_not_stop_the_email(send, service, staff):
 
     assert len(sent) == 2
     assert all("\n" not in m.subject for m in sent)
+
+
+def test_staff_get_a_copy_of_their_bookings(send, service, staff):
+    _, sent = send(services.create_booking, service, at(next_weekday(0), 10), customer(), staff)
+
+    to_business = next(m for m in sent if "owner@example.com" in m.to)
+    assert to_business.to == ["owner@example.com", "robin@example.com"]
+
+
+def test_no_copy_when_the_staff_member_is_the_owner(send, service, staff):
+    staff.email = "OWNER@example.com"
+    staff.save()
+
+    _, sent = send(services.create_booking, service, at(next_weekday(0), 10), customer(), staff)
+
+    to_business = next(m for m in sent if "owner@example.com" in m.to)
+    assert to_business.to == ["owner@example.com"]
