@@ -88,6 +88,9 @@ def _customer(kind, booking, *, attach_ics=False, **extra):
 
 def _business_recipients(booking):
     recipients = [booking.business.notification_email]
+    staff_email = booking.staff.email
+    if staff_email and staff_email.lower() not in {r.lower() for r in recipients}:
+        recipients.append(staff_email)
     return recipients
 
 
