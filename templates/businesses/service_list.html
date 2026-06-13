@@ -16,6 +16,7 @@
     <tr>
       <td>
         <a href="{% url 'businesses:service_edit' service.pk %}">{{ service.name }}</a>
+        {% if not service.is_public %}<span class="badge">Not on booking page</span>{% endif %}
       </td>
       <td>{{ service.duration_minutes|duration }}</td>
       <td class="muted">

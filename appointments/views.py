@@ -28,6 +28,7 @@ def _business(slug):
 
 def _public_services(business):
     services_qs = business.services.filter(is_active=True)
+    services_qs = services_qs.filter(is_public=True)
     return services_qs
 
 

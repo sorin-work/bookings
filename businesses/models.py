@@ -117,6 +117,11 @@ class Service(models.Model):
         help_text="Time kept free afterwards, for example to clean up.",
     )
     is_active = models.BooleanField(default=True)
+    is_public = models.BooleanField(
+        "shown on the booking page",
+        default=True,
+        help_text="Untick for services you only book in yourself, like consultations.",
+    )
     position = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 

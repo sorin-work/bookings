@@ -56,6 +56,7 @@ class ServiceForm(forms.ModelForm):
             "price",
             "buffer_before_minutes",
             "buffer_after_minutes",
+            "is_public",
         ]
         widgets = {"description": forms.Textarea(attrs={"rows": 3})}
 

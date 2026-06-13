@@ -17,6 +17,7 @@ def service_data(**overrides):
         "price": "70.00",
         "buffer_before_minutes": 0,
         "buffer_after_minutes": 10,
+        "is_public": "on",
     }
     data.update(overrides)
     return data

@@ -171,3 +171,12 @@ def test_customer_note_is_saved(client, business, service, staff):
     client.post(book_url(business, service, start, staff), customer_data(note="Sensitive scalp"))
 
     assert Booking.objects.get().customer_note == "Sensitive scalp"
+
+
+def test_services_hidden_from_the_booking_page_cannot_be_booked(client, business, service, staff):
+    service.is_public = False
+    service.save()
+
+    response = client.get(reverse("appointments:service", args=[business.slug, service.pk]))
+
+    assert response.status_code == 404
