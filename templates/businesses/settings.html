@@ -34,5 +34,6 @@
 <div class="card form" style="margin-top: 1.5rem">
   <h2>Account</h2>
   <p><a href="{% url 'accounts:password_change' %}">Change your password</a></p>
+  <p><a class="button button-danger" href="{% url 'accounts:delete' %}">Delete account…</a></p>
 </div>
 {% endblock %}

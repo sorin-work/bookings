@@ -28,4 +28,5 @@ urlpatterns = [
         name="password_reset_complete",
     ),
     path("password/", views.PasswordChangeView.as_view(), name="password_change"),
+    path("delete/", views.delete_account, name="delete"),
 ]

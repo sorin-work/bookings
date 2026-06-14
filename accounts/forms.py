@@ -48,3 +48,23 @@ class LoginForm(AuthenticationForm):
 
     def clean_username(self):
         return self.cleaned_data["username"].strip().lower()
+
+
+class DeleteAccountForm(forms.Form):
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"}),
+        help_text="To make sure it's you.",
+    )
+    confirm = forms.BooleanField(
+        label="I understand that my business, staff, services and bookings are deleted for good."
+    )
+
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        if not self.user.check_password(password):
+            raise forms.ValidationError("That's not your password.")
+        return password

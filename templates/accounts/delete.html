@@ -1,0 +1,15 @@
+{% extends "app.html" %}
+{% block title %}Delete account{% endblock %}
+{% block content %}
+<h1>Delete your account</h1>
+<p>This deletes your login, {% if business %}{{ business.name }}, its booking page and every booking in it{% else %}and everything in it{% endif %}. Customers with upcoming bookings are <strong>not</strong> emailed, so cancel those first if you need to.</p>
+<form method="post" class="card form" novalidate>
+  {% csrf_token %}
+  {% include "includes/field.html" with field=form.password %}
+  {% include "includes/field.html" with field=form.confirm %}
+  <div class="actions">
+    <button type="submit" class="button button-danger">Delete everything</button>
+    <a href="{% url 'businesses:settings' %}">Keep my account</a>
+  </div>
+</form>
+{% endblock %}
