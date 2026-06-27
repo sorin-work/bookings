@@ -20,6 +20,9 @@
   {% include "includes/field.html" with field=form.phone %}
   {% include "includes/field.html" with field=form.note %}
   <div class="hp" aria-hidden="true">{% include "includes/field.html" with field=form.website %}</div>
+  {% if business.cancellation_notice_hours %}
+  <p class="muted small">You can cancel or move this booking online up to {{ business.cancellation_notice_hours }} hour{{ business.cancellation_notice_hours|pluralize }} before it starts.</p>
+  {% endif %}
   <div class="actions">
     <button type="submit" class="button button-primary">{% if business.require_confirmation %}Request booking{% else %}Book{% endif %}</button>
   </div>

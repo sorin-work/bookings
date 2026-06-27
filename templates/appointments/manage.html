@@ -43,6 +43,9 @@
     <p class="muted small">It's too close to the appointment to change it online. Please contact {{ business.name }}{% if business.phone %} on <a href="tel:{{ business.phone }}">{{ business.phone }}</a>{% endif %}.</p>
     {% endif %}
   </div>
+  {% if booking.is_open and business.cancellation_notice_hours %}
+  <p class="muted small">Changes and cancellations are possible online up to {{ business.cancellation_notice_hours }} hour{{ business.cancellation_notice_hours|pluralize }} before the appointment.</p>
+  {% endif %}
 </div>
 <p class="muted small" style="margin-top: 1rem">Keep this page's address (or the email) to come back to your booking. <a href="{% url 'appointments:business' business.slug %}">Book something else</a></p>
 {% endblock %}
