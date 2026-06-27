@@ -60,10 +60,14 @@ def _least_busy_first(business, members, start):
     return sorted(members, key=lambda m: (counts.get(m.pk, 0), m.name, m.pk))
 
 
-def free_staff(service, start, staff=None, now=None):
+def free_staff(service, start, staff=None, now=None, exclude=None):
     """Staff who can take `service` at `start`, least busy first."""
     candidates = [staff] if staff else list(availability.bookable_staff(service))
-    free = [m for m in candidates if availability.is_available(service, m, start, now=now)]
+    free = [
+        m
+        for m in candidates
+        if availability.is_available(service, m, start, now=now, exclude=exclude)
+    ]
     return _least_busy_first(service.business, free, start)
 
 
@@ -147,7 +151,9 @@ def reschedule_booking(booking, start, *, now=None):
         raise BookingClosed
     with transaction.atomic():
         _lock_staff([booking.staff])
-        if not availability.is_available(booking.service, booking.staff, start, now=now):
+        if not availability.is_available(
+            booking.service, booking.staff, start, now=now, exclude=booking
+        ):
             raise SlotUnavailable
         old_start = booking.start
         duration = booking.end - booking.start
@@ -182,7 +188,7 @@ def confirm_booking(booking, *, now=None):
         # When the hold ran out, it can still go ahead if nobody took the time since.
         expired = booking.hold_expires_at and booking.hold_expires_at <= now
         if expired and not availability.is_available(
-            booking.service, booking.staff, booking.start, now=now
+            booking.service, booking.staff, booking.start, now=now, exclude=booking
         ):
             raise SlotUnavailable
         booking.status = Booking.Status.CONFIRMED

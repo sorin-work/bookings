@@ -101,6 +101,18 @@ def test_cancelled_booking_cannot_be_moved(client, booking):
     assert booking.status == Booking.Status.CANCELLED
 
 
+def test_move_by_half_an_hour(client, booking):
+    new_start = booking.start + timedelta(minutes=30)
+
+    client.post(
+        reverse("appointments:manage_reschedule", args=[make_token(booking)]),
+        {"start": new_start.isoformat()},
+    )
+
+    booking.refresh_from_db()
+    assert booking.start == new_start
+
+
 def test_customers_cannot_cancel_inside_the_notice_period(client, service, staff):
     soon = make_booking(service, staff, timezone.now() + timedelta(hours=5))
 

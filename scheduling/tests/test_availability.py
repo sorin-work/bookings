@@ -142,6 +142,14 @@ def test_no_slots_on_closed_days(business, service, staff):
     assert availability.available_days(service)[monday + timedelta(days=1)] is True
 
 
+def test_a_booking_does_not_block_itself_when_moving(service, staff):
+    monday = next_weekday(0)
+    booking = make_booking(service, staff, at(monday, 10))
+
+    assert not availability.is_available(service, staff, at(monday, 10, 30))
+    assert availability.is_available(service, staff, at(monday, 10, 30), exclude=booking)
+
+
 def test_available_days_matches_the_slots_of_each_day(
     service, staff, django_assert_max_num_queries
 ):

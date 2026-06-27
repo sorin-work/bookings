@@ -33,7 +33,7 @@ def service_spec(service):
     )
 
 
-def load_schedules(business, staff_members, first_day, last_day, *, now=None):
+def load_schedules(business, staff_members, first_day, last_day, *, exclude=None, now=None):
     """A StaffSchedule per staff member with everything that blocks time between the days."""
     tz = business.tz
     # A day's slots can be blocked by bookings whose buffers reach in from either
@@ -50,6 +50,9 @@ def load_schedules(business, staff_members, first_day, last_day, *, now=None):
     bookings = Booking.objects.blocking(now).filter(
         staff_id__in=staff_ids, start__lt=range_end, end__gt=range_start
     )
+    if exclude is not None:
+        # When moving a booking, its current time shouldn't block the new one.
+        bookings = bookings.exclude(pk=exclude.pk)
     fields = ["staff_id", "start", "end", "buffer_before_minutes", "buffer_after_minutes"]
     for booking in bookings.only(*fields):
         busy[booking.staff_id].append(Interval(booking.busy_start, booking.busy_end))
@@ -65,7 +68,7 @@ def load_schedules(business, staff_members, first_day, last_day, *, now=None):
     ]
 
 
-def available_slots(service, day, staff=None, now=None):
+def available_slots(service, day, staff=None, now=None, exclude=None):
     """Free slots for `service` on `day`, for one staff member or everyone who offers it.
 
     Sorted by start time; with several staff, the same start time shows up once per
@@ -77,7 +80,7 @@ def available_slots(service, day, staff=None, now=None):
     if business.closed_days.filter(date=day).exists():
         return []
     members = [staff] if staff else list(bookable_staff(service))
-    schedules = load_schedules(business, members, day, day, now=now)
+    schedules = load_schedules(business, members, day, day, exclude=exclude, now=now)
     return _slots(business, service, schedules, day, earliest)
 
 
@@ -120,7 +123,8 @@ def available_days(service, staff=None, now=None):
     return days
 
 
-def is_available(service, staff, start, now=None):
+def is_available(service, staff, start, now=None, exclude=None):
     """Whether `staff` can take `service` at exactly `start`."""
     day = start.astimezone(service.business.tz).date()
-    return any(slot.start == start for slot in available_slots(service, day, staff=staff, now=now))
+    slots = available_slots(service, day, staff=staff, now=now, exclude=exclude)
+    return any(slot.start == start for slot in slots)
