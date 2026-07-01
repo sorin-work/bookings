@@ -84,6 +84,11 @@ class Booking(models.Model):
 
     class Meta:
         ordering = ["start"]
+        indexes = [
+            models.Index(fields=["staff", "start"], name="booking_staff_start"),
+            models.Index(fields=["business", "start"], name="booking_business_start"),
+            models.Index(fields=["business", "customer_email"], name="booking_business_customer"),
+        ]
 
     def __str__(self):
         return f"{self.reference} {self.customer_name} {self.start:%Y-%m-%d %H:%M}"
