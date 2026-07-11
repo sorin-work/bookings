@@ -77,3 +77,24 @@ def top_services(business, days=90, limit=5):
         .annotate(count=Count("pk"))
         .order_by("-count", "service__name")[:limit]
     )
+
+
+def weekly_counts(business, weeks=12):
+    """[(monday, bookings)] for the last `weeks` weeks including this one."""
+    today = business.today()
+    this_monday = today - timedelta(days=today.weekday())
+    mondays = [this_monday - timedelta(weeks=n) for n in range(weeks - 1, -1, -1)]
+    qs = Booking.objects.filter(
+        business=business,
+        start__gte=_start_of(mondays[0], business.tz),
+        start__lt=_start_of(this_monday + timedelta(days=7), business.tz),
+    ).exclude(status__in=Booking.CLOSED_STATUSES)
+    counts = dict.fromkeys(mondays, 0)
+    for start in qs.values_list("start", flat=True):
+        local = start.astimezone(business.tz).date()
+        counts[local - timedelta(days=local.weekday())] += 1
+    peak = max(counts.values()) or 1
+    return [
+        {"monday": monday, "count": count, "percent": round(count * 100 / peak)}
+        for monday, count in counts.items()
+    ]

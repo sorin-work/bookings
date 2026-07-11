@@ -55,6 +55,13 @@
     {% endif %}
   </div>
   <div class="card">
+    <h2>Bookings per week</h2>
+    <div class="bars" role="img" aria-label="Bookings per week for the last 12 weeks">
+      {% for week in weekly %}<div class="bar" style="height: {{ week.percent }}%" title="Week of {{ week.monday|date:'j M' }}: {{ week.count }}"></div>{% endfor %}
+    </div>
+    <div class="bars-labels">{% for week in weekly %}<span>{% if forloop.first or forloop.last or forloop.counter|divisibleby:4 %}{{ week.monday|date:"j/n" }}{% endif %}</span>{% endfor %}</div>
+  </div>
+  <div class="card">
     <h2>Most booked, last 90 days</h2>
     {% if top_services %}
     <table class="table">

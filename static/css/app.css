@@ -210,6 +210,10 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .button:focus-v
 .agenda li { display: flex; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
 .agenda li:last-child { border-bottom: 0; }
 .agenda .time { font-variant-numeric: tabular-nums; min-width: 3.2rem; font-weight: 600; }
+.bars { display: flex; align-items: flex-end; gap: 4px; height: 120px; }
+.bars .bar { flex: 1; background: var(--primary); border-radius: 3px 3px 0 0; min-height: 2px; position: relative; }
+.bars-labels { display: flex; gap: 4px; font-size: 0.7rem; color: var(--muted); }
+.bars-labels span { flex: 1; text-align: center; }
 
 .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: end; margin-bottom: 1rem; }
 .filters .field { margin: 0; }
