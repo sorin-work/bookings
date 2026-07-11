@@ -90,3 +90,18 @@ def test_top_services(business, service, staff):
         {"service__name": "Haircut", "count": 3},
         {"service__name": "Beard trim", "count": 1},
     ]
+
+
+def test_weekly_counts(business, service, staff):
+    make_booking(service, staff, today_at(business, 10))
+    make_booking(service, staff, today_at(business, 12))
+    make_booking(service, staff, today_at(business, 10, days=-7))
+
+    weeks = stats.weekly_counts(business)
+
+    assert len(weeks) == 12
+    assert weeks[-1]["count"] == 2
+    assert weeks[-1]["percent"] == 100
+    assert weeks[-2]["count"] == 1
+    assert weeks[-2]["percent"] == 50
+    assert weeks[0]["monday"].weekday() == 0
