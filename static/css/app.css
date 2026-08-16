@@ -195,6 +195,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .button:focus-v
 .calendar-event.is-cancelled { opacity: 0.5; text-decoration: line-through; }
 .calendar-event strong { display: block; }
 .calendar-off { position: absolute; left: 0; right: 0; background: repeating-linear-gradient(45deg, transparent 0 6px, rgb(107 114 128 / 12%) 6px 12px); font-size: 0.75rem; color: var(--muted); padding: 0.2rem 0.4rem; }
+.calendar-now { position: absolute; left: 0; right: 0; border-top: 2px solid var(--danger); z-index: 2; pointer-events: none; }
 .calendar-hour-link { position: absolute; left: 0; right: 0; height: var(--hour-height); }
 .calendar-hour-link:hover { background: color-mix(in srgb, var(--primary) 8%, transparent); }
 

@@ -7,6 +7,8 @@ are percentages of the column height.
 from dataclasses import dataclass, field
 from datetime import datetime, time, timedelta
 
+from django.utils import timezone
+
 from appointments.models import Booking
 from businesses.models import TimeOff
 
@@ -35,6 +37,7 @@ class Column:
     staff: object = None
     events: list = field(default_factory=list)
     blocks: list = field(default_factory=list)
+    now_top: float | None = None
 
 
 @dataclass
@@ -99,6 +102,7 @@ def _position(start, end, day, start_hour, end_hour, tz):
 
 def _fill(grid, business, bookings, time_off=()):
     tz = business.tz
+    now = timezone.now()
     for column in grid.columns:
         for booking in bookings:
             if column.staff is not None and booking.staff_id != column.staff.pk:
@@ -119,6 +123,11 @@ def _fill(grid, business, bookings, time_off=()):
                 if column.staff is None:
                     label = f"{item.staff.name}: {label}"
                 column.blocks.append(Block(label, *position))
+        now_position = _position(
+            now, now + timedelta(minutes=1), column.day, grid.start_hour, grid.end_hour, tz
+        )
+        if now_position:
+            column.now_top = now_position[0]
     return grid
 
 

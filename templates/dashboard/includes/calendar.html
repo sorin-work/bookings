@@ -41,6 +41,7 @@
         {{ event.booking.service.name }}{% if not column.staff %} · {{ event.booking.staff.name }}{% endif %}
       </a>
       {% endfor %}
+      {% if column.now_top is not None %}<div class="calendar-now" style="top: {{ column.now_top }}%"></div>{% endif %}
     </div>
     {% endfor %}
   </div>
