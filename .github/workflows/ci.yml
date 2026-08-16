@@ -36,6 +36,8 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: ruff check .
       - run: ruff format --check .
+      - name: Migrations are up to date
+        run: python manage.py makemigrations --check --dry-run
       - run: pytest
 
   docker:
