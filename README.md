@@ -122,6 +122,7 @@ Both are safe to run as often as you like. With Docker:
 ```bash
 pytest                    # needs the database from docker compose (port 5446)
 ruff check .
+ruff format --check .
 ```
 
 pytest-django creates and drops a `test_bookings` database next to the real one.
