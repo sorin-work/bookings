@@ -36,7 +36,7 @@
       <a class="calendar-event{% if event.booking.status == 'cancelled' %} is-cancelled{% endif %}"
         href="{% url 'dashboard:booking' event.booking.pk %}"
         hx-get="{% url 'dashboard:booking' event.booking.pk %}" hx-target="#panel"
-        style="top: {{ event.top }}%; height: {{ event.height }}%; --event-color: {{ event.booking.staff.color }}">
+        style="top: {{ event.top }}%; height: {{ event.height }}%; left: calc({{ event.left }}% + 2px); width: calc({{ event.width }}% - 4px); right: auto; --event-color: {{ event.booking.staff.color }}">
         <strong>{{ event.booking.start|date:"H:i" }} {{ event.booking.customer_name }}</strong>
         {{ event.booking.service.name }}{% if not column.staff %} · {{ event.booking.staff.name }}{% endif %}
       </a>

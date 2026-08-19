@@ -21,6 +21,16 @@ class Event:
     booking: Booking
     top: float
     height: float
+    lane: int = 0
+    lanes: int = 1
+
+    @property
+    def left(self):
+        return self.lane * 100 / self.lanes
+
+    @property
+    def width(self):
+        return 100 / self.lanes
 
 
 @dataclass
@@ -100,6 +110,31 @@ def _position(start, end, day, start_hour, end_hour, tz):
     return round(top, 3), round(height, 3)
 
 
+def _assign_lanes(events):
+    """Put overlapping events side by side instead of on top of each other."""
+    events.sort(key=lambda e: (e.booking.start, e.booking.end))
+    cluster, cluster_end = [], None
+    for event in events + [None]:
+        if event is None or (cluster_end is not None and event.booking.start >= cluster_end):
+            lanes_end = []
+            for item in cluster:
+                for lane, lane_end in enumerate(lanes_end):
+                    if item.booking.start >= lane_end:
+                        item.lane = lane
+                        lanes_end[lane] = item.booking.end
+                        break
+                else:
+                    item.lane = len(lanes_end)
+                    lanes_end.append(item.booking.end)
+            for item in cluster:
+                item.lanes = len(lanes_end)
+            cluster, cluster_end = [], None
+            if event is None:
+                break
+        cluster.append(event)
+        cluster_end = max(cluster_end, event.booking.end) if cluster_end else event.booking.end
+
+
 def _fill(grid, business, bookings, time_off=()):
     tz = business.tz
     now = timezone.now()
@@ -112,6 +147,7 @@ def _fill(grid, business, bookings, time_off=()):
             )
             if position:
                 column.events.append(Event(booking, *position))
+        _assign_lanes(column.events)
         for item in time_off:
             if column.staff is not None and item.staff_id != column.staff.pk:
                 continue

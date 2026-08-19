@@ -165,3 +165,19 @@ def test_grid_stretches_to_show_bookings_outside_working_hours(business, service
 
     assert (grid.start_hour, grid.end_hour) == (7, 19)
     assert len(grid.columns[0].events) == 2
+
+
+def test_overlapping_bookings_sit_side_by_side(business, service, staff):
+    monday = next_weekday(0)
+    first = make_booking(service, staff, at(monday, 10))
+    second = make_booking(service, staff, at(monday, 10, 30))
+    later = make_booking(service, staff, at(monday, 14))
+
+    grid = calendar.day_grid(business, monday, [staff])
+
+    events = {event.booking: event for event in grid.columns[0].events}
+    assert (events[first].lane, events[first].lanes) == (0, 2)
+    assert (events[second].lane, events[second].lanes) == (1, 2)
+    assert events[second].left == 50
+    assert (events[later].lane, events[later].lanes) == (0, 1)
+    assert events[later].width == 100
