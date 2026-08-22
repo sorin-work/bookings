@@ -1,0 +1,36 @@
+{% extends "app.html" %}
+{% block title %}Customers · {{ business.name }}{% endblock %}
+{% block content %}
+<div class="page-header"><h1>Customers</h1></div>
+<form method="get" class="filters">
+  <div class="field"><label for="q">Search</label><input id="q" type="search" name="q" value="{{ q }}" placeholder="Name, email or phone"></div>
+  <button type="submit" class="button">Search</button>
+</form>
+{% if page.object_list %}
+<table class="table">
+  <thead><tr><th>Customer</th><th>Phone</th><th class="num">Bookings</th><th class="num">Visits</th><th class="num">No-shows</th><th>Last visit</th><th>Next booking</th></tr></thead>
+  <tbody>
+    {% for row in page.object_list %}
+    <tr>
+      <td>{{ row.name }}<div class="muted small">{{ row.email }}</div></td>
+      <td>{{ row.phone }}</td>
+      <td class="num">{{ row.bookings }}</td>
+      <td class="num">{{ row.visits }}</td>
+      <td class="num">{{ row.no_shows }}</td>
+      <td>{{ row.last_visit|date:"j M Y"|default:"–" }}</td>
+      <td>{{ row.next_booking|date:"j M Y, H:i"|default:"–" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% if page.paginator.num_pages > 1 %}
+<nav class="pagination">
+  {% if page.has_previous %}<a href="?q={{ q|urlencode }}&amp;page={{ page.previous_page_number }}">← Previous</a>{% endif %}
+  <span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a href="?q={{ q|urlencode }}&amp;page={{ page.next_page_number }}">Next →</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<div class="card empty">{% if q %}No customers match “{{ q }}”.{% else %}Customers show up here after their first booking.{% endif %}</div>
+{% endif %}
+{% endblock %}

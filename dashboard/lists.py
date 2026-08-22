@@ -4,9 +4,10 @@ import csv
 from datetime import date, datetime, time, timedelta
 
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Count, Max, Min, Q
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.utils import timezone
 
 from appointments.models import Booking
 from businesses.decorators import business_required
@@ -121,3 +122,31 @@ def bookings_csv(request):
             ]
         )
     return response
+
+
+@business_required
+def customers(request):
+    """Everyone who has booked, grouped by email address."""
+    now = timezone.now()
+    qs = request.business.bookings.exclude(status=Booking.Status.EXPIRED)
+    q = request.GET.get("q", "").strip()
+    if q:
+        qs = qs.filter(
+            Q(customer_name__icontains=q)
+            | Q(customer_email__icontains=q)
+            | Q(customer_phone__icontains=q)
+        )
+    rows = qs.values("customer_email")
+    rows = rows.annotate(
+        name=Max("customer_name"),
+        phone=Max("customer_phone"),
+        bookings=Count("pk"),
+        visits=Count("pk", filter=Q(status=Booking.Status.COMPLETED)),
+        no_shows=Count("pk", filter=Q(status=Booking.Status.NO_SHOW)),
+        first_booking=Min("start"),
+        last_visit=Max("start", filter=Q(start__lte=now, status=Booking.Status.COMPLETED)),
+        next_booking=Min("start", filter=Q(start__gt=now, status__in=[Booking.Status.CONFIRMED])),
+    ).order_by("name")
+    rows = [{**row, "email": row["customer_email"]} for row in rows]
+    page = Paginator(rows, 50).get_page(request.GET.get("page"))
+    return render(request, "dashboard/customers.html", {"page": page, "q": q})

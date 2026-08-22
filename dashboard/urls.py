@@ -14,4 +14,5 @@ urlpatterns = [
     path("bookings/", lists.bookings, name="bookings"),
     path("bookings/new/", views.booking_new, name="booking_new"),
     path("bookings/export.csv", lists.bookings_csv, name="bookings_csv"),
+    path("customers/", lists.customers, name="customers"),
 ]
