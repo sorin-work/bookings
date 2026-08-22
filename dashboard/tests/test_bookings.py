@@ -137,6 +137,35 @@ def test_cancelling_twice_sends_one_email(
     assert len(mail.outbox) == 1
 
 
+def test_customer_list_groups_bookings_by_email(owner_client, service, staff):
+    monday = next_weekday(0)
+    make_booking(service, staff, at(monday, 10))
+    make_booking(service, staff, at(monday, 12))
+    make_booking(
+        service, staff, at(monday, 14), customer_name="Bo Chen", customer_email="bo@example.com"
+    )
+
+    response = owner_client.get(reverse("dashboard:customers"))
+
+    rows = list(response.context["page"].object_list)
+    assert [(row["name"], row["bookings"]) for row in rows] == [("Ana Lima", 2), ("Bo Chen", 1)]
+
+
+def test_customer_page(owner_client, service, staff):
+    make_booking(service, staff, at(next_weekday(0), 10))
+
+    response = owner_client.get(reverse("dashboard:customer"), {"email": "ana@example.com"})
+
+    assert response.status_code == 200
+    assert len(response.context["upcoming"]) == 1
+
+
+def test_unknown_customer_is_a_404(owner_client, business):
+    response = owner_client.get(reverse("dashboard:customer"), {"email": "who@example.com"})
+
+    assert response.status_code == 404
+
+
 def test_private_note(owner_client, service, staff):
     booking = make_booking(service, staff, at(next_weekday(0), 10))
 
