@@ -5,7 +5,7 @@ from datetime import date, datetime, time, timedelta
 
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Min, Q
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -150,3 +150,25 @@ def customers(request):
     rows = [{**row, "email": row["customer_email"]} for row in rows]
     page = Paginator(rows, 50).get_page(request.GET.get("page"))
     return render(request, "dashboard/customers.html", {"page": page, "q": q})
+
+
+@business_required
+def customer_detail(request):
+    email = request.GET.get("email", "").strip()
+    if not email:
+        raise Http404("No customer given.")
+    bookings = request.business.bookings.filter(customer_email=email)
+    bookings = list(bookings.select_related("service", "staff").order_by("-start"))
+    if not bookings:
+        raise Http404("No bookings for this customer.")
+    now = timezone.now()
+    context = {
+        "email": email,
+        "latest": bookings[0],
+        "upcoming": [b for b in reversed(bookings) if b.start > now and b.is_open],
+        "past": [b for b in bookings if b.start <= now or not b.is_open],
+        "visits": sum(1 for b in bookings if b.status == Booking.Status.COMPLETED),
+        "no_shows": sum(1 for b in bookings if b.status == Booking.Status.NO_SHOW),
+        "spent": sum(b.price for b in bookings if b.status == Booking.Status.COMPLETED),
+    }
+    return render(request, "dashboard/customer_detail.html", context)

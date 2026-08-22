@@ -15,6 +15,7 @@
     {% if booking.customer_note %}<dt>Note</dt><dd>{{ booking.customer_note|linebreaksbr }}</dd>{% endif %}
   </dl>
 </div>
+<p class="small"><a href="{% url 'dashboard:customer' %}?email={{ booking.customer_email|urlencode }}">All bookings for this customer</a></p>
 <div class="actions">
   {% if can_mark %}
   <button class="button-small" hx-post="{% url 'dashboard:booking_outcome' booking.pk %}" hx-vals='{"status": "completed"}' hx-target="#panel">Completed</button>

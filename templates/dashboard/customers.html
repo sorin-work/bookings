@@ -12,7 +12,7 @@
   <tbody>
     {% for row in page.object_list %}
     <tr>
-      <td>{{ row.name }}<div class="muted small">{{ row.email }}</div></td>
+      <td><a href="{% url 'dashboard:customer' %}?email={{ row.email|urlencode }}">{{ row.name }}</a><div class="muted small">{{ row.email }}</div></td>
       <td>{{ row.phone }}</td>
       <td class="num">{{ row.bookings }}</td>
       <td class="num">{{ row.visits }}</td>

@@ -1,0 +1,33 @@
+{% extends "app.html" %}
+{% load ui %}
+{% block title %}{{ latest.customer_name }} · Customers{% endblock %}
+{% block content %}
+<p><a href="{% url 'dashboard:customers' %}">← Customers</a></p>
+<h1>{{ latest.customer_name }}</h1>
+<p class="muted"><a href="mailto:{{ latest.customer_email }}">{{ latest.customer_email }}</a> · <a href="tel:{{ latest.customer_phone }}">{{ latest.customer_phone }}</a></p>
+<div class="stats">
+  <div class="card stat"><div class="value">{{ visits }}</div><div class="label">Visits</div></div>
+  <div class="card stat"><div class="value">{{ no_shows }}</div><div class="label">No-shows</div></div>
+  <div class="card stat"><div class="value">{{ spent|money }}</div><div class="label">Spent</div></div>
+</div>
+<h2>Upcoming</h2>
+{% if upcoming %}
+<table class="table">
+  <tbody>
+    {% for booking in upcoming %}
+    <tr><td><a href="{% url 'dashboard:booking' booking.pk %}">{{ booking.start|date:"D j M Y, H:i" }}</a></td><td>{{ booking.service.name }}</td><td>{{ booking.staff.name }}</td><td class="status-{{ booking.status }}">{{ booking.get_status_display }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">Nothing booked.</p>
+{% endif %}
+<h2>History</h2>
+<table class="table">
+  <tbody>
+    {% for booking in past %}
+    <tr><td><a href="{% url 'dashboard:booking' booking.pk %}">{{ booking.start|date:"D j M Y, H:i" }}</a></td><td>{{ booking.service.name }}</td><td>{{ booking.staff.name }}</td><td class="status-{{ booking.status }}">{{ booking.get_status_display }}</td><td class="num">{{ booking.price|money }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

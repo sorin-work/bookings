@@ -15,4 +15,5 @@ urlpatterns = [
     path("bookings/new/", views.booking_new, name="booking_new"),
     path("bookings/export.csv", lists.bookings_csv, name="bookings_csv"),
     path("customers/", lists.customers, name="customers"),
+    path("customers/detail/", lists.customer_detail, name="customer"),
 ]
