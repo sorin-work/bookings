@@ -136,3 +136,12 @@ def test_no_copy_when_the_staff_member_is_the_owner(send, service, staff):
 
     to_business = next(m for m in sent if "owner@example.com" in m.to)
     assert to_business.to == ["owner@example.com"]
+
+
+def test_customer_emails_have_an_html_version(send, service, staff):
+    _, sent = send(services.create_booking, service, at(next_weekday(0), 10), customer(), staff)
+
+    to_customer = next(m for m in sent if m.to == ["ana@example.com"])
+    html, mimetype = to_customer.alternatives[0]
+    assert mimetype == "text/html"
+    assert "Manage your booking" in html
