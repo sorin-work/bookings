@@ -166,6 +166,18 @@ def test_unknown_customer_is_a_404(owner_client, business):
     assert response.status_code == 404
 
 
+def test_email_case_does_not_split_a_customer(owner_client, service, staff):
+    monday = next_weekday(0)
+    make_booking(service, staff, at(monday, 10), customer_email="Ana@Example.com")
+    make_booking(service, staff, at(monday, 12), customer_email="ana@example.com")
+
+    response = owner_client.get(reverse("dashboard:customers"))
+
+    rows = list(response.context["page"].object_list)
+    assert len(rows) == 1
+    assert rows[0]["bookings"] == 2
+
+
 def test_private_note(owner_client, service, staff):
     booking = make_booking(service, staff, at(next_weekday(0), 10))
 

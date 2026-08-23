@@ -5,6 +5,7 @@ from datetime import date, datetime, time, timedelta
 
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Min, Q
+from django.db.models.functions import Lower
 from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -136,7 +137,8 @@ def customers(request):
             | Q(customer_email__icontains=q)
             | Q(customer_phone__icontains=q)
         )
-    rows = qs.values("customer_email")
+    # People type their email with different capitals from one booking to the next.
+    rows = qs.annotate(email=Lower("customer_email")).values("email")
     rows = rows.annotate(
         name=Max("customer_name"),
         phone=Max("customer_phone"),
@@ -147,7 +149,6 @@ def customers(request):
         last_visit=Max("start", filter=Q(start__lte=now, status=Booking.Status.COMPLETED)),
         next_booking=Min("start", filter=Q(start__gt=now, status__in=[Booking.Status.CONFIRMED])),
     ).order_by("name")
-    rows = [{**row, "email": row["customer_email"]} for row in rows]
     page = Paginator(rows, 50).get_page(request.GET.get("page"))
     return render(request, "dashboard/customers.html", {"page": page, "q": q})
 
@@ -157,7 +158,7 @@ def customer_detail(request):
     email = request.GET.get("email", "").strip()
     if not email:
         raise Http404("No customer given.")
-    bookings = request.business.bookings.filter(customer_email=email)
+    bookings = request.business.bookings.filter(customer_email__iexact=email)
     bookings = list(bookings.select_related("service", "staff").order_by("-start"))
     if not bookings:
         raise Http404("No bookings for this customer.")
