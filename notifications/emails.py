@@ -7,7 +7,8 @@ in the business's time zone.
 import logging
 
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
+from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.utils import timezone
 
@@ -59,12 +60,18 @@ def _send(name, booking, to, subject, *, reply_to=None, attach_ics=False, **extr
     context = _context(booking, **extra)
     with timezone.override(booking.business.tz):
         body = render_to_string(f"emails/{name}.txt", context)
-    message = EmailMessage(
+        try:
+            html = render_to_string(f"emails/{name}.html", context)
+        except TemplateDoesNotExist:
+            html = None
+    message = EmailMultiAlternatives(
         subject=_subject(subject, booking),
         body=body,
         to=to,
         reply_to=reply_to,
     )
+    if html:
+        message.attach_alternative(html, "text/html")
     if attach_ics:
         message.attach(f"booking-{booking.reference}.ics", booking_ics(booking), "text/calendar")
     try:

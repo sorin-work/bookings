@@ -1,0 +1,3 @@
+{% extends "emails/_base.html" %}
+{% block content %}<p>Hi {{ booking.customer_name }}, {% if booking.cancelled_by == "business" %}sorry, {{ business.name }} had to cancel your booking.{% else %}your booking is cancelled.{% endif %}</p>{% endblock %}
+{% block action %}<p><a href="{{ site_url }}{% url 'appointments:business' business.slug %}" style="color:{{ business.accent_color|default:"#2563eb" }};">Book another time</a></p>{% endblock %}

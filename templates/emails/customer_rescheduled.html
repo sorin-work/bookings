@@ -1,0 +1,2 @@
+{% extends "emails/_base.html" %}
+{% block content %}<p>Hi {{ booking.customer_name }}, your booking has moved to a new time. It was on {{ old_start|date:"l j F" }} at {{ old_start|date:"H:i" }}.</p>{% endblock %}
