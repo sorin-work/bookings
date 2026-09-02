@@ -221,3 +221,40 @@ def test_many_busy_periods_are_checked_correctly():
 
     assert starts(slots)[:3] == ["09:05", "09:15", "09:25"]
     assert "10:00" in starts(slots)
+
+
+def test_shift_ending_at_midnight():
+    slots = staff_slots(
+        schedule(Shift(0, time(22), time(23, 59))),
+        ServiceSpec(HOUR),
+        MONDAY,
+        LONDON,
+        interval=HALF_HOUR,
+    )
+
+    assert starts(slots) == ["22:00", "22:30"]
+
+
+def test_interval_that_does_not_divide_the_shift():
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(10))),
+        ServiceSpec(timedelta(minutes=20)),
+        MONDAY,
+        LONDON,
+        interval=timedelta(minutes=25),
+    )
+
+    assert starts(slots) == ["09:00", "09:25"]
+
+
+def test_busy_period_from_the_day_before_reaches_into_the_morning():
+    overnight = Interval(at(MONDAY - timedelta(days=1), 20), at(MONDAY, 9, 30))
+    slots = staff_slots(
+        schedule(Shift(0, time(9), time(11)), busy=[overnight]),
+        ServiceSpec(HALF_HOUR),
+        MONDAY,
+        LONDON,
+        interval=HALF_HOUR,
+    )
+
+    assert starts(slots)[0] == "09:30"
