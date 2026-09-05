@@ -180,3 +180,28 @@ def test_services_hidden_from_the_booking_page_cannot_be_booked(client, business
     response = client.get(reverse("appointments:service", args=[business.slug, service.pk]))
 
     assert response.status_code == 404
+
+
+def test_staff_choice_can_be_turned_off(client, business, service, staff):
+    other = StaffMember.objects.create(business=business, name="Kit")
+    other.services.add(service)
+    business.allow_staff_choice = False
+    business.save()
+
+    response = client.get(
+        reverse("appointments:service", args=[business.slug, service.pk]), {"staff": other.pk}
+    )
+
+    assert response.context["staff"] is None
+    assert response.context["staff_options"] == []
+    assert "Anyone available" not in response.content.decode()
+
+
+def test_staff_choice_is_offered_by_default(client, business, service, staff):
+    other = StaffMember.objects.create(business=business, name="Kit")
+    other.services.add(service)
+
+    response = client.get(reverse("appointments:service", args=[business.slug, service.pk]))
+
+    assert "Anyone available" in response.content.decode()
+    assert "Kit" in response.content.decode()
