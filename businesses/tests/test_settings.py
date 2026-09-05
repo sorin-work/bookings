@@ -20,6 +20,7 @@ def settings_data(business, **overrides):
         "min_notice_minutes": 120,
         "max_advance_days": 60,
         "cancellation_notice_hours": 24,
+        "accent_color": "#2563eb",
     }
     data.update(overrides)
     return data

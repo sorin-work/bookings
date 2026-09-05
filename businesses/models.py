@@ -64,6 +64,12 @@ class Business(models.Model):
         default=24,
         help_text="Customers can cancel or move a booking up to this many hours before it starts.",
     )
+    accent_color = models.CharField(
+        max_length=7,
+        default="#2563eb",
+        validators=[RegexValidator(HEX_COLOR, "Use a colour like #2563eb.")],
+        help_text="Buttons and highlights on your booking page.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

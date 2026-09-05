@@ -27,9 +27,11 @@ class BusinessForm(forms.ModelForm):
             "max_advance_days",
             "cancellation_notice_hours",
             "require_confirmation",
+            "accent_color",
         ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
+            "accent_color": forms.TextInput(attrs={"type": "color"}),
         }
         labels = {
             "min_notice_minutes": "Minimum notice (minutes)",
