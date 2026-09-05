@@ -64,6 +64,9 @@ class Business(models.Model):
         default=24,
         help_text="Customers can cancel or move a booking up to this many hours before it starts.",
     )
+    allow_staff_choice = models.BooleanField(
+        default=True, help_text="Let customers choose who they book with."
+    )
     accent_color = models.CharField(
         max_length=7,
         default="#2563eb",

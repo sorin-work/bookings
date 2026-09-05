@@ -27,6 +27,7 @@ class BusinessForm(forms.ModelForm):
             "max_advance_days",
             "cancellation_notice_hours",
             "require_confirmation",
+            "allow_staff_choice",
             "accent_color",
         ]
         widgets = {

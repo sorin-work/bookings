@@ -45,6 +45,8 @@ def _service(business, service_id):
 
 def _staff(request, business, service):
     """The staff member from ?staff=, or None for "anyone available"."""
+    if not business.allow_staff_choice:
+        return None
     staff_id = request.GET.get("staff") or request.POST.get("staff")
     if not staff_id:
         return None
@@ -90,7 +92,9 @@ def service_page(request, slug, service_id):
         "business": business,
         "service": service,
         "staff": staff,
-        "staff_options": availability.bookable_staff(service),
+        "staff_options": (
+            availability.bookable_staff(service) if business.allow_staff_choice else []
+        ),
         "slots_url": reverse("appointments:slots", args=[business.slug, service.pk]),
         "book_url": reverse("appointments:book", args=[business.slug, service.pk]),
         **_picker(service, staff, _parse_day(request.GET.get("date"))),
