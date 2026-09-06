@@ -150,6 +150,14 @@ def test_a_booking_does_not_block_itself_when_moving(service, staff):
     assert availability.is_available(service, staff, at(monday, 10, 30), exclude=booking)
 
 
+def test_no_slots_past_the_booking_window(business, service, staff):
+    far = next_weekday(0, weeks_ahead=12)
+    assert (far - business.today()).days > business.max_advance_days
+
+    assert availability.available_slots(service, far) == []
+    assert not availability.is_available(service, staff, at(far, 10))
+
+
 def test_available_days_matches_the_slots_of_each_day(
     service, staff, django_assert_max_num_queries
 ):

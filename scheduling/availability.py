@@ -77,6 +77,8 @@ def available_slots(service, day, staff=None, now=None, exclude=None):
     business = service.business
     now = now or timezone.now()
     first_day, last_day, earliest = booking_window(business, now)
+    if not first_day <= day <= last_day:
+        return []
     if business.closed_days.filter(date=day).exists():
         return []
     members = [staff] if staff else list(bookable_staff(service))

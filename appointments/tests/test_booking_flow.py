@@ -182,6 +182,15 @@ def test_services_hidden_from_the_booking_page_cannot_be_booked(client, business
     assert response.status_code == 404
 
 
+def test_times_past_the_booking_window_cannot_be_booked(client, business, service, staff):
+    start = at(next_weekday(0, weeks_ahead=12), 10)
+
+    response = client.post(book_url(business, service, start, staff), customer_data())
+
+    assert response.status_code == 302
+    assert not Booking.objects.exists()
+
+
 def test_staff_choice_can_be_turned_off(client, business, service, staff):
     other = StaffMember.objects.create(business=business, name="Kit")
     other.services.add(service)
