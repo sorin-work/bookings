@@ -30,6 +30,7 @@ services:
       EMAIL_PORT: '1025'
       # Creates demo@example.com / demo-password with a salon and sample bookings.
       SEED_DEMO: ${SEED_DEMO:-true}
+      LOG_FORMAT: ${LOG_FORMAT:-plain}
     depends_on:
       db:
         condition: service_healthy

@@ -160,9 +160,13 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "plain": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"},
+        "json": {"()": "core.logging.JsonFormatter"},
     },
     "handlers": {
-        "console": {"class": "logging.StreamHandler", "formatter": "plain"},
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "json" if os.environ.get("LOG_FORMAT") == "json" else "plain",
+        },
     },
     "root": {"handlers": ["console"], "level": LOG_LEVEL},
     "loggers": {
