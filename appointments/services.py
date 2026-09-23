@@ -159,7 +159,9 @@ def reschedule_booking(booking, start, *, now=None):
         duration = booking.end - booking.start
         booking.start = start
         booking.end = start + duration
-        booking.save(update_fields=["start", "end", "updated_at"])
+        # The old reminder was for the old time.
+        booking.reminder_sent_at = None
+        booking.save(update_fields=["start", "end", "reminder_sent_at", "updated_at"])
         _after_commit(emails.booking_rescheduled, booking, old_start)
     return booking
 

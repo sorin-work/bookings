@@ -7,8 +7,9 @@ from django.core.management import call_command
 from django.utils import timezone
 
 from appointments.models import Booking
+from appointments.services import reschedule_booking
 from notifications.reminders import due_reminders, send_due_reminders
-from testutils import make_booking
+from testutils import at, make_booking, next_weekday
 
 pytestmark = pytest.mark.django_db
 
@@ -63,3 +64,13 @@ def test_command(service, staff):
     call_command("send_reminders", stdout=out)
 
     assert "Sent 1 reminder." in out.getvalue()
+
+
+def test_moved_booking_gets_a_new_reminder(service, staff):
+    booking = booked_ahead(service, staff, 20)
+    send_due_reminders()
+
+    reschedule_booking(booking, at(next_weekday(2), 10))
+
+    booking.refresh_from_db()
+    assert booking.reminder_sent_at is None
