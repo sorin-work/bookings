@@ -105,3 +105,16 @@ def test_weekly_counts(business, service, staff):
     assert weeks[-2]["count"] == 1
     assert weeks[-2]["percent"] == 50
     assert weeks[0]["monday"].weekday() == 0
+
+
+def test_checklist_for_a_new_business(owner_client, business):
+    response = owner_client.get(reverse("dashboard:home"))
+
+    checklist = response.context["checklist"]
+    assert [item["done"] for item in checklist] == [False, False, False, False]
+
+
+def test_checklist_disappears_once_everything_is_set_up(owner_client, staff):
+    response = owner_client.get(reverse("dashboard:home"))
+
+    assert response.context["checklist"] is None
