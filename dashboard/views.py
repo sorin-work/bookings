@@ -26,11 +26,35 @@ def home(request):
         "rates": stats.outcome_rates(business),
         "top_services": stats.top_services(business),
         "weekly": stats.weekly_counts(business),
+        "checklist": _checklist(business),
         "booking_page_url": request.build_absolute_uri(
             reverse("appointments:business", args=[business.slug])
         ),
     }
     return render(request, "dashboard/home.html", context)
+
+
+def _checklist(business):
+    """Getting-started steps; hidden once they're all done."""
+    staff = business.staff.all()
+    steps = [
+        ("Add a service", business.services.filter(is_active=True).exists(), "businesses:services"),
+        ("Add your staff", staff.exists(), "businesses:staff"),
+        (
+            "Set working hours",
+            staff.filter(working_hours__isnull=False).exists(),
+            "businesses:staff",
+        ),
+        (
+            "Link services to staff",
+            business.services.filter(staff__isnull=False).exists(),
+            "businesses:staff",
+        ),
+    ]
+    items = [{"label": label, "done": done, "url": reverse(url)} for label, done, url in steps]
+    if all(item["done"] for item in items):
+        return None
+    return items
 
 
 def _parse_day(value, default):
