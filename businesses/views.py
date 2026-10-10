@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from dashboard.feeds import feed_url
+
 from .decorators import business_required
 from .forms import (
     BusinessForm,
@@ -133,7 +135,8 @@ def staff_form(request, pk=None):
             messages.info(request, "Now add their working hours.")
             return redirect("businesses:staff_hours", pk=member.pk)
         return redirect("businesses:staff")
-    return render(request, "businesses/staff_form.html", {"form": form, "member": member})
+    context = {"form": form, "member": member, "feed_url": feed_url(member) if member else None}
+    return render(request, "businesses/staff_form.html", context)
 
 
 @business_required

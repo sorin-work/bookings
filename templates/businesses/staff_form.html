@@ -15,4 +15,11 @@
     <a href="{% url 'businesses:staff' %}">Cancel</a>
   </div>
 </form>
+{% if member %}
+<div class="card form" style="margin-top: 1.5rem">
+  <h2>Calendar feed</h2>
+  <p class="muted">Subscribe to this address in Google Calendar, Apple Calendar or Outlook to see {{ member.name }}'s bookings on a phone. Anyone with the link can see the bookings, so keep it private.</p>
+  <input type="text" readonly value="{{ feed_url }}" onclick="this.select()">
+</div>
+{% endif %}
 {% endblock %}

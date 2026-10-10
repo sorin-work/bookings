@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import lists, views
+from . import feeds, lists, views
 
 app_name = "dashboard"
 
@@ -16,4 +16,5 @@ urlpatterns = [
     path("bookings/export.csv", lists.bookings_csv, name="bookings_csv"),
     path("customers/", lists.customers, name="customers"),
     path("customers/detail/", lists.customer_detail, name="customer"),
+    path("feeds/staff/<int:pk>/<str:token>.ics", feeds.staff_feed, name="staff_feed"),
 ]
