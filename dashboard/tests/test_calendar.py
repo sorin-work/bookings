@@ -2,11 +2,13 @@ from datetime import date, timedelta
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
 from accounts.models import User
 from appointments.models import Booking
 from businesses.models import Business, TimeOff
 from dashboard import calendar
+from dashboard.feeds import feed_token
 from testutils import at, make_booking, next_weekday
 
 pytestmark = pytest.mark.django_db
@@ -181,3 +183,21 @@ def test_overlapping_bookings_sit_side_by_side(business, service, staff):
     assert events[second].left == 50
     assert (events[later].lane, events[later].lanes) == (0, 1)
     assert events[later].width == 100
+
+
+def test_staff_feed_lists_upcoming_bookings(client, service, staff):
+    make_booking(service, staff, timezone.now() + timedelta(days=2), customer_name="Bea Cole")
+    url = reverse("dashboard:staff_feed", args=[staff.pk, feed_token(staff)])
+
+    response = client.get(url)
+
+    body = response.content.decode()
+    assert response.status_code == 200
+    assert "BEGIN:VCALENDAR" in body
+    assert "SUMMARY:Haircut: Bea Cole" in body
+
+
+def test_staff_feed_needs_the_right_token(client, staff):
+    url = reverse("dashboard:staff_feed", args=[staff.pk, "not-the-token"])
+
+    assert client.get(url).status_code == 404
