@@ -235,3 +235,12 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .button:focus-v
   .hours-day { grid-template-columns: 1fr; gap: 0.25rem; }
   .table { display: block; overflow-x: auto; }
 }
+
+@media print {
+  .sidebar, .calendar-toolbar, .panel, .actions, .messages { display: none; }
+  .shell { display: block; }
+  .content { padding: 0; }
+  body { background: #fff; }
+  .calendar { border: 0; overflow: visible; }
+  .calendar-event { break-inside: avoid; }
+}
