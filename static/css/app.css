@@ -244,3 +244,23 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .button:focus-v
   .calendar { border: 0; overflow: visible; }
   .calendar-event { break-inside: avoid; }
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111418;
+    --surface: #1a1e24;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --border: #2c323b;
+    --primary: #3b82f6;
+    --danger: #f87171;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --shadow: 0 1px 2px rgb(0 0 0 / 40%);
+    color-scheme: dark;
+  }
+  .message, .form-errors { background: #1e2533; border-color: #334155; }
+  .message-success { background: #10261b; border-color: #166534; }
+  .message-error, .form-errors { background: #2a1515; border-color: #7f1d1d; }
+  .message-warning { background: #2a2010; border-color: #78350f; }
+}
