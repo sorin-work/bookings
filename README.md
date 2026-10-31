@@ -238,3 +238,14 @@ docker/          entrypoint
   staff member.
 - Prices are shown as plain amounts with no currency and there are no online payments.
 - Reminders and expiry depend on the two scheduled commands above.
+
+## Troubleshooting
+
+- **Port already in use**: another project is using 4406, 5446 or 8026. Pick other
+  ports in `.env`, e.g. `APP_PORT=4416`.
+- **`connection refused` from pytest or runserver**: the database isn't running; start
+  it with `docker compose up -d db`.
+- **No demo data**: the seed only runs when the demo account doesn't exist yet. Use
+  `docker compose down -v` to start from an empty database.
+- **Booking links stopped working**: they are signed with `SECRET_KEY`; links sent
+  before it changed can't be verified any more.
