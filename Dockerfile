@@ -19,7 +19,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PATH="/venv/bin:$PATH"
 
 WORKDIR /app
-RUN useradd --system --no-create-home --shell /usr/sbin/nologin app
+# gunicorn keeps a control socket in the user's home directory.
+RUN useradd --system --create-home --shell /usr/sbin/nologin app
 COPY --from=build /venv /venv
 COPY --from=build /app /app
 USER app
