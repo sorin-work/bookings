@@ -239,6 +239,11 @@ docker/          entrypoint
 - Prices are shown as plain amounts with no currency and there are no online payments.
 - Reminders and expiry depend on the two scheduled commands above.
 
+## Roadmap
+
+Ideas for what could come next, with notes on how each would be built, are in
+[ROADMAP.md](ROADMAP.md).
+
 ## Troubleshooting
 
 - **Port already in use**: another project is using 4406, 5446 or 8026. Pick other
